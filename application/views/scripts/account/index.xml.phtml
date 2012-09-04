@@ -1,0 +1,19 @@
+<?php
+
+$doc = new DOMDocument();
+$doc->formatOutput = true;
+$root_element = $doc->createElement("response");
+$doc->appendChild($root_element);
+ 
+$accountElement = $doc->createElement("accountid");
+$accountElement->appendChild($doc->createTextNode($this->bankAccount->getId()));
+$root_element->appendChild($accountElement);
+$accountElement = $doc->createElement("owner");
+$accountElement->appendChild($doc->createTextNode($this->bankAccount->getOwner()));
+$root_element->appendChild($accountElement);
+$accountElement = $doc->createElement("saldo");
+$accountElement->appendChild($doc->createTextNode($this->bankAccount->getSaldo()));
+$root_element->appendChild($accountElement);
+
+print $doc->saveXML();
+?>
