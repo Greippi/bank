@@ -14,8 +14,8 @@ $root_element->appendChild($accountElement);
 $accountElement = $doc->createElement("owner");
 $accountElement->appendChild($doc->createTextNode($this->msg->owner));
 $root_element->appendChild($accountElement);
-$accountElement = $doc->createElement("saldo");
-$accountElement->appendChild($doc->createTextNode($this->msg->saldo));
+$accountElement = $doc->createElement("balance");
+$accountElement->appendChild($doc->createTextNode($this->msg->balance));
 $root_element->appendChild($accountElement);
 
 print $doc->saveXML();

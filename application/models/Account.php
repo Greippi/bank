@@ -3,7 +3,7 @@
 class Application_Model_Account
 {
     public $_id; 
-    public $_saldo;
+    public $_balance;
     public $_owner;
     
     public function __set($name, $value)
@@ -43,8 +43,8 @@ class Application_Model_Account
         return $this;
     }
     
-    public function setSaldo($saldo) {
-        $this->_saldo = $saldo;
+    public function setBalance($balance) {
+        $this->_balance = $balance;
         return $this;
     }
     
@@ -57,8 +57,8 @@ class Application_Model_Account
         return $this->_id;        
     }
     
-    public function getSaldo() {
-        return $this->_saldo;        
+    public function getBalance() {
+        return $this->_balance;        
     }
     
     public function getOwner() {

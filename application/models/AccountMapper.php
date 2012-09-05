@@ -47,7 +47,7 @@ class Application_Model_AccountMapper
             $entry = new Application_Model_Account();
             
             $entry->setId($row->account_id)
-                  ->setSaldo($row->saldo)
+                  ->setBalance($row->balance)
                   ->setOwner($row->owner);
             $entries[] = $entry;
         }
@@ -63,7 +63,7 @@ class Application_Model_AccountMapper
             foreach ($rows as $row) {  
                 $entry = new Application_Model_Account();
                 $entry->setId($row->account_id)
-                      ->setSaldo($row->saldo)
+                      ->setBalance($row->balance)
                       ->setOwner($row->owner);
             }
             return $entry;

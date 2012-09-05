@@ -4,18 +4,8 @@ class TransactionController extends Zend_Rest_Controller
 {
 	public function init()
     {
-            /*
-        $bootstrap = $this->getInvokeArg('bootstrap');
-	$options = $bootstrap->getOption('resources');
- 
-	$contextSwitch = $this->_helper->getHelper('contextSwitch');
-	$contextSwitch->addActionContext('index', array('xml','json'))->initContext();
- 
-	//$this->_helper->viewRenderer->setNeverRender();	
-	$this->view->success = "true";
-	$this->view->version = "1.0";*/
         $this->_helper->contextSwitch()
-        ->setContext(
+            ->setContext(
                 'html', array(
                 'suffix'    => 'html',
                 'headers'   => array(
@@ -34,35 +24,72 @@ class TransactionController extends Zend_Rest_Controller
      */ 
     public function indexAction()
     {
-		//if you want to have access to a particular paramater use the helper function as follows:
-		//print $this->_helper->getParam('abc');
-               //To test with this use:  http://myURL/format/xml/abc/1002
-	}
+    }
  
     public function listAction()
     {
+        die;
         $this->_forward('index');
     }
  
     public function getAction()
     {
-		$this->_forward('index');
+        $msg = new Kilosoft_TransactionInfoMsg();
+        $id = $this->_getParam('id');
+        if(strval(intval($id)) != strval($id))
+        {
+            $msg->status = 406;            
+            $this->_forward('index');            
+        }
+        else 
+        {
+            $transactions = new Application_Model_TransactionMapper();
+            $data = $transactions->fetchTransactionsById($id);    
+            if(isset($data) && count($data) > 0)
+            {
+                $msg->status = 200;            
+                foreach ($data as $item) {  
+                    $entry = array(
+                        'id' => $item->getId(),
+                        'account' => $item->getAccount(),
+                        'target' => $item->getTarget(),                
+                        'reference' => $item->getReference(), 				  
+                        'amount' => $item->getAmount(), 				                      
+                        'description' => $item->getDescription(), 				                                          
+                        'done' => $item->getDone()); 				                                                              
+                    $entries[] = $entry;                
+                }
+                $msg->transactions = $entries;
+            }   
+        }
+        $this->view->msg = $msg;        
+        $this->_forward('index');
     }
  
-    public function newAction() {   	
-		$this->_forward('index');
+    public function newAction() { 
+        die;
+        $this->_forward('index');
     }
+    
     public function postAction() {
-		$this->_forward('index');
+        $body = $this->getRequest()->getRawBody();
+        $data = Zend_Json::decode($body);
+        echo var_dump($data);
+        die;
+        $this->_forward('index');
     }
+    
     public function editAction() {    	 
-		$this->_forward('index');
+        die;
+	$this->_forward('index');
     }
     public function putAction() {
-		$this->_forward('index');
+        die;        
+	$this->_forward('index');
     } 
     public function deleteAction() {
-		$this->_forward('index');
+        die;        
+	$this->_forward('index');
     }
 }
 

@@ -3,8 +3,8 @@
 class Application_Model_Transaction
 {
     protected $_id; 
-    protected $_source;
-    protected $_destination;
+    protected $_account;
+    protected $_target;
     protected $_reference;
     protected $_amount;
     protected $_description;
@@ -49,13 +49,13 @@ class Application_Model_Transaction
         return $this;
     }
     
-    public function setSource($source) {
-        $this->_source = $source;
+    public function setAccount($account) {
+        $this->_account = $account;
         return $this;
     }
     
-    public function setDestination($destination) {
-        $this->_destination = $destination;
+    public function setTarget($target) {
+        $this->_target = $target;
         return $this;
     }
 
@@ -83,12 +83,12 @@ class Application_Model_Transaction
         return $this->_id;        
     }
 
-    public function getSource() {
-        return $this->_source;
+    public function getAccount() {
+        return $this->_account;
     }
     
-    public function getDestination() {
-        return $this->_destination;
+    public function getTarget() {
+        return $this->_target;
     }
 
     public function getReference() {

@@ -26,54 +26,67 @@ class AccountController extends Zend_Rest_Controller
     }
  
     
-    public function infoAction()
-    {
-    }
     /**
      * The index action handles index/list requests; it should respond with a
      * list of the requested resources.
      */ 
     public function indexAction()
     {
+        
     }
  
     public function listAction()
     {
-        
+        die;
     }
  
     public function getAction()
     {
-        $msg = new Application_Model_AccountMessage();
+        $msg = new Kilosoft_AccountInfoMsg();
         $id = $this->_getParam('id');
-        $account = new Application_Model_AccountMapper();
-        $data = $account->fetchAccount($id);    
-        
-
-        if(isset($data))
+        if(strval(intval($id)) != strval($id))
         {
-            $msg->id = $data->getId();
-            $msg->owner = $data->getOwner();
-            $msg->saldo = $data->getSaldo();
-            $msg->status = 200;
+            $msg->status = 406;            
+        }
+        else 
+        {
+            $account = new Application_Model_AccountMapper();
+            $data = $account->fetchAccount($id);    
+
+            if(isset($data) && count($data) > 0)
+            {
+                $msg->id = $data->getId();
+                $msg->owner = $data->getOwner();
+                $msg->balance = $data->getBalance();
+                $msg->status = 200;
+            }
         }
         $this->view->msg = $msg;        
         $this->_forward('index');
     }
  
-    public function newAction() {   	
+    public function newAction() {
+        die;
 	$this->_forward('index');
     }
     public function postAction() {
+        //$this->getParams() or $this->getParam('yourvar');
+        $body = $this->getRequest()->getRawBody();
+        $data = Zend_Json::decode($body);
+        var_dump($data);
+        die;
 	$this->_forward('index');
     }
-    public function editAction() {    	 
+    public function editAction() { 
+        die;
 	$this->_forward('index');
     }
     public function putAction() {
+        die;
 	$this->_forward('index');
     } 
     public function deleteAction() {
+        die;
 	$this->_forward('index');
     }
 }
