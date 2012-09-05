@@ -69,5 +69,14 @@ class Application_Model_AccountMapper
             return $entry;
         }
     }  
+    
+    public function updateAccount($id, $balance) {    
+        $table = $this->getDbTable();        
+        $data = array(
+            'balance' => $balance
+        );
+        $where['account_id = ?'] = $id;
+        $table->update($data, $where);
+    }  
 }
 

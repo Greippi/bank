@@ -37,9 +37,17 @@ class AccountController extends Zend_Rest_Controller
  
     public function listAction()
     {
-        die;
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     }
- 
+
+    public function headAction()
+    {
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
+    }
+
+    
     public function getAction()
     {
         $msg = new Kilosoft_AccountInfoMsg();
@@ -66,10 +74,13 @@ class AccountController extends Zend_Rest_Controller
     }
  
     public function newAction() {
-        die;
-	$this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     }
     public function postAction() {
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
+        
         //$this->getParams() or $this->getParam('yourvar');
         $body = $this->getRequest()->getRawBody();
         $data = Zend_Json::decode($body);
@@ -78,16 +89,16 @@ class AccountController extends Zend_Rest_Controller
 	$this->_forward('index');
     }
     public function editAction() { 
-        die;
-	$this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     }
     public function putAction() {
-        die;
-	$this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     } 
     public function deleteAction() {
-        die;
-	$this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     }
 }
 

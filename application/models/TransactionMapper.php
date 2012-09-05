@@ -87,5 +87,18 @@ class Application_Model_TransactionMapper
         }
         return $entries;
     }
+
+    public function createTransaction($account, $target, $reference, $amount, $description){
+        $table = $this->getDbTable();    
+        $data = array('account' => $account,
+		    'target' => $account,
+		    'reference' => $reference,
+		    'amount' => $amount,
+		    'description' => 'ATM');
+        $table->insert($data);
+        return 1;
+    }
+    
+    
 }
 

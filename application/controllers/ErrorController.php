@@ -3,6 +3,12 @@
 class ErrorController extends Zend_Controller_Action
 {
 
+    public function headAction()
+    {
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
+    }
+
     public function errorAction()
     {
         $errors = $this->_getParam('error_handler');

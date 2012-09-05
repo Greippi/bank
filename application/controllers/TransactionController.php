@@ -28,8 +28,8 @@ class TransactionController extends Zend_Rest_Controller
  
     public function listAction()
     {
-        die;
-        $this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     }
  
     public function getAction()
@@ -67,29 +67,72 @@ class TransactionController extends Zend_Rest_Controller
     }
  
     public function newAction() { 
-        die;
-        $this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     }
     
     public function postAction() {
-        $body = $this->getRequest()->getRawBody();
-        $data = Zend_Json::decode($body);
-        echo var_dump($data);
-        die;
-        $this->_forward('index');
+ /*        $body = $this->getRequest()->getRawBody();
+        $transaction = Zend_Json::decode($body);
+        if(isset($transaction)){
+            $this->getResponse()->setHttpResponseCode(200);
+        }
+        else{
+            $this->getResponse()->setHttpResponseCode(406);
+            exit( 'Invalid parameters' );
+        }
+        
+        $account = new Application_Model_AccountMapper();
+        $data = $account->fetchAccount(1);
+        if(!isset($data)){
+            $this->getResponse()->setHttpResponseCode(406);
+            exit( 'Account not found' );
+        }
+        $oldBalance = $data->getBalance();
+        if($oldBalance < 100){
+            $this->getResponse()->setHttpResponseCode(406);
+            exit( 'Not enought credit' );
+        }*/
+        $amount = -100;        
+        $id = 1;
+        $account = new Application_Model_AccountMapper();
+        $data = $account->fetchAccount(1);
+        if(!isset($data)){
+            $this->getResponse()->setHttpResponseCode(406);
+            exit( 'Account not found' );
+        }
+        $oldBalance = $data->getBalance();        
+        if($amount < 0 && ($oldBalance + $amount < 0)){
+            $this->getResponse()->setHttpResponseCode(406);
+            exit( 'Not enought credit' );
+        }
+        
+        $account->updateAccount($id, $oldBalance + $amount);
+        $transaction = new Application_Model_TransactionMapper();
+        $transaction->createTransaction($id, $id, uniqid(), $amount, '');
+        
+        $this->getResponse()->setHttpResponseCode(200);        
+        exit();
     }
     
     public function editAction() {    	 
-        die;
-	$this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     }
     public function putAction() {
-        die;        
-	$this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     } 
     public function deleteAction() {
-        die;        
-	$this->_forward('index');
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
     }
+
+    public function headAction()
+    {
+        $this->getResponse()->setHttpResponseCode(500);        
+        exit('not implemented');
+    }
+    
 }
 

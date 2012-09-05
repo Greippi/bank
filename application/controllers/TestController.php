@@ -14,7 +14,6 @@ class TestController extends Zend_Rest_Controller{
         $json = json_encode($datax);
         $client = new Zend_Http_Client('http://localhost:10082/transaction/?format=json');
         $data = $client->setRawData($json, 'application/json')->request('post');        
-        var_dump($data);
         die;
         //$client->setRawData($json, 'application/json')->request('get');
         exit;
@@ -36,7 +35,12 @@ class TestController extends Zend_Rest_Controller{
     {
         
     }
- 
+
+    public function headAction()
+    {
+        die;
+    }
+
  
     public function newAction() {   	
     }
