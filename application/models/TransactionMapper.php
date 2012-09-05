@@ -39,8 +39,8 @@ class Application_Model_TransactionMapper
             $this->getDbTable()->update($data, array('id = ?' => $id));
         }*/
     }
-    protected $_source;
-    protected $_destination;
+    protected $_account;
+    protected $_target;
     protected $_reference;
     protected $_amount;
     protected $_description;
@@ -53,12 +53,36 @@ class Application_Model_TransactionMapper
             $entry = new Application_Model_Transaction();
             
             $entry->setId($row->transaction_id)
-                  ->setSource($row->source)
-                  ->setDestination($row->destination)
-                  ->setReference($row->reference)				  
-				  ->setAmount($row->amount)
-				  ->setDescription($row->description)
-				  ->setDone($row->done);
+                    ->setAccount($row->account)
+                    ->setTarget($row->target)
+                    ->setReference($row->reference)			
+                    ->setAmount($row->amount)
+                    ->setDescription($row->description)
+                    ->setDone($row->done);
+            $entries[] = $entry;
+        }
+        return $entries;
+    }
+    
+    public function fetchTransactionsById($id) {
+        $table = $this->getDbTable();
+        
+        $query = $table->select()
+                       ->where('account = :id' )
+                       ->order('done DESC')
+                       ->limit(10,0)
+                       ->bind(array('id'=>$id));
+        $rows = $table->fetchAll($query);                
+        $entries = NULL;        
+        foreach ($rows as $row) {
+            $entry = new Application_Model_Transaction();
+            $entry->setId($row->transaction_id)
+                    ->setAccount($row->account)
+                    ->setTarget($row->target)
+                    ->setReference($row->reference)				  
+                    ->setAmount($row->amount)
+                    ->setDescription($row->description)
+                    ->setDone($row->done);
             $entries[] = $entry;
         }
         return $entries;
