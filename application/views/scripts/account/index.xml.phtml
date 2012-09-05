@@ -4,15 +4,18 @@ $doc = new DOMDocument();
 $doc->formatOutput = true;
 $root_element = $doc->createElement("response");
 $doc->appendChild($root_element);
- 
+
+$accountElement = $doc->createElement("status");
+$accountElement->appendChild($doc->createTextNode($this->msg->status));
+$root_element->appendChild($accountElement);
 $accountElement = $doc->createElement("accountid");
-$accountElement->appendChild($doc->createTextNode($this->bankAccount->getId()));
+$accountElement->appendChild($doc->createTextNode($this->msg->id));
 $root_element->appendChild($accountElement);
 $accountElement = $doc->createElement("owner");
-$accountElement->appendChild($doc->createTextNode($this->bankAccount->getOwner()));
+$accountElement->appendChild($doc->createTextNode($this->msg->owner));
 $root_element->appendChild($accountElement);
 $accountElement = $doc->createElement("saldo");
-$accountElement->appendChild($doc->createTextNode($this->bankAccount->getSaldo()));
+$accountElement->appendChild($doc->createTextNode($this->msg->saldo));
 $root_element->appendChild($accountElement);
 
 print $doc->saveXML();

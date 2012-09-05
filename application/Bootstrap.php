@@ -4,11 +4,19 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
     protected function _initRestRoute()
     {
-        $router = Zend_Controller_Front::getInstance ()->getRouter ();
-        $router->addRoute('rest_url', new Zend_Controller_Router_Route('account/:accountid/', array( 'module'=>'ModuleName', 'controller' => 'account', 'action' => 'info', 'accountid' => '-1')));                
+        /*
+        $this->bootstrap('frontController');
+        $frontController = Zend_Controller_Front::getInstance();        
+        $restRouteURL = new Zend_Rest_Route($frontController, array( 'controller' => 'account', 'module' => 'jees', 'action' => 'info', 'accountid' => '-1'));                
+        $frontController->getRouter()->addRoute('rest', $restRouteURL);
+        $transactionURL = new Zend_Rest_Route($frontController, array( 'controller' => 'transaction', 'action' => 'info', 'transactionid' => '-1'));                        
+        $frontController->getRouter()->addRoute('rest', $transactionURL);
 
-
-
+*/
+        $this->bootstrap('frontController');
+        $frontController = Zend_Controller_Front::getInstance();            
+        $restRoute = new Zend_Rest_Route($frontController);
+        $frontController->getRouter()->addRoute('default', $restRoute);
         
 /*        
 	$this->bootstrap('Request');	

@@ -54,18 +54,19 @@ class Application_Model_AccountMapper
         return $entries;
     }
     
-    public function fetchAccount($accountId) {  
+    public function fetchAccount($id) {  
+        $entry = NULL;        
         $table = $this->getDbTable();
-        $rows = $table->find((int)$accountId);
+        $rows = $table->find((int)$id);
         if(isset($rows))
         {
-            foreach ($rows as $row) {            
+            foreach ($rows as $row) {  
                 $entry = new Application_Model_Account();
                 $entry->setId($row->account_id)
                       ->setSaldo($row->saldo)
                       ->setOwner($row->owner);
             }
-            return $entry;    
+            return $entry;
         }
     }  
 }
