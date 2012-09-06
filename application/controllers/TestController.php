@@ -9,10 +9,11 @@ class TestController extends Zend_Rest_Controller{
         
         $client = new Zend_Http_Client('http://localhost:10082/transaction/');
         $client->setHeaders('joo', 'JooParam');        
+        $client->setParameterPost("format", "xml");        
         $client->setMethod(Zend_Http_Client::POST);
         $client->setParameterPost('operation', 'withdraw');
         $client->setParameterPost('description', 'ATM withdraw');        
-        $client->setParameterPost('sum', '100');
+        $client->setParameterPost('sum', '---s100');
         $client->setParameterPost('accountid', '1');
         $response = $client->request();        
         echo $response;

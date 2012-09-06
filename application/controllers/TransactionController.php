@@ -16,6 +16,12 @@ class TransactionController extends Zend_Rest_Controller
          ->addActionContext('index', array('html','xml', 'json'))
          ->setAutoJsonSerialization(false)
          ->initContext();  
+        
+        $this->_helper->contextSwitch()
+                      ->addActionContext('response', array('html', 'xml', 'json'))
+                      ->setAutoJsonSerialization(false)
+                      ->initContext();
+        
     }
  
     /**
@@ -25,20 +31,25 @@ class TransactionController extends Zend_Rest_Controller
     public function indexAction()
     {
     }
- 
+
+    public function responseAction()
+    {
+    }
+    
     public function listAction()
     {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
  
     public function getAction()
     {
         $msg = new Kilosoft_TransactionInfoMsg();
+        $this->view->msg = $msg;                
         $id = $this->_getParam('id');
         if(strval(intval($id)) != strval($id))
         {
-            $msg->status = 406;            
+            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
             $this->_forward('index');            
         }
         else 
@@ -47,7 +58,6 @@ class TransactionController extends Zend_Rest_Controller
             $data = $transactions->fetchTransactionsById($id);    
             if(isset($data) && count($data) > 0)
             {
-                $msg->status = 200;            
                 foreach ($data as $item) {  
                     $entry = array(
                         'id' => $item->getId(),
@@ -60,14 +70,13 @@ class TransactionController extends Zend_Rest_Controller
                     $entries[] = $entry;                
                 }
                 $msg->transactions = $entries;
-            }   
+            }  
         }
-        $this->view->msg = $msg;        
         $this->_forward('index');
     }
  
     public function newAction() { 
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     
@@ -81,6 +90,9 @@ class TransactionController extends Zend_Rest_Controller
     
     
     public function postAction() {
+        $msg = new Kilosoft_ResponseMsg();
+        $this->view->msg = $msg;         
+
         //Try first with header parameters
         //Apache way to do it $action = $this-> getFrontController()-> getRequest()->getHeader('operation');        
         $request = new Zend_Controller_Request_Http();
@@ -88,7 +100,7 @@ class TransactionController extends Zend_Rest_Controller
         $amount = $request->getHeader('sum');
         $accountId = $request->getHeader('accountid');
         $description = $request->getHeader('description');        
-        
+
         //Then try with post parameters        
         if(!isset($action) || empty($action))
             $action = $this->getRequest()->getParam('operation');
@@ -102,23 +114,23 @@ class TransactionController extends Zend_Rest_Controller
             $description = '';
         
         if(!isset($action) || !isset($amount) || !isset($accountId)){
-            $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Invalid or missing parameters' );
+            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_PARAMETERS;
+            $this->_forward('response');
         }
         if(strval(intval($accountId)) != strval($accountId))
         {
-            $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Invalid account ID parameter' );            
+            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;
+            $this->_forward('response');
         }
-        if(strval(floatval($accountId)) != strval($accountId))
+        if(strval(floatval($amount)) != strval($amount))
         {
-            $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Invalid sum parameter' );            
+            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_AMOUNT_PARAM;
+            $this->_forward('response');
         }
         if($action != 'withdraw' && $action != 'deposit')
         {
-            $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Invalid operation type parameter' );            
+            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACTION_PARAM;
+            $this->_forward('response');
         }
         
         if($action == 'withdraw'){
@@ -128,14 +140,14 @@ class TransactionController extends Zend_Rest_Controller
         $account = new Application_Model_AccountMapper();
         $data = $account->fetchAccount($accountId);
         if(!isset($data)){
-            $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Account not found' );
+            $msg->status = Kilosoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
+            $this->_forward('response');
         }
 
         $oldBalance = $data->getBalance();        
         if($amount < 0 && ($oldBalance + $amount < 0)){
-            $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Not enought credit' );
+            $msg->status = Kilosoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
+            $this->_forward('response');
         }
         
         try{
@@ -144,35 +156,33 @@ class TransactionController extends Zend_Rest_Controller
             $account->updateAccount($accountId, $oldBalance + $amount);
             $transaction = new Application_Model_TransactionMapper();
             $transaction->createTransaction($accountId, $accountId, uniqid(), $amount, $description);
-            $db->commit();        
+            $db->commit();  
+            $msg->status = Kilosoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
+            $this->_forward('response');
         } catch (Exception $e) {
             error_log ('BANK::ERROR: '.$e, 0);                        
             $db->rollBack();                    
-            $this->getResponse()->setHttpResponseCode(500);
-            exit( 'Failed to save to database' );            
+            $response->status = Kilosoft_ErrorCodes::ERR_DB_SAVE_FAILED;
+            $this->_forward('response');
         }
-        
-        
-        $this->getResponse()->setHttpResponseCode(200);        
-        exit();
     }
     
     public function editAction() {    	 
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     public function putAction() {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     } 
     public function deleteAction() {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
 
     public function headAction()
     {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     

@@ -8,7 +8,7 @@ class Kilosoft_AccountInfoMsg
     public $owner;
     
    function __construct() {
-       $this->status = 500;
+       $this->status = Kilosoft_ErrorCodes::HTTP_OK;
        $this->id = -1;
        $this->balance = 0;
        $this->owner = '';

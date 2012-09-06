@@ -6,7 +6,7 @@ class Kilosoft_TransactionInfoMsg
     public $transactions;
     
    function __construct() {
-       $this->status = 500;
+       $this->status = Kilosoft_ErrorCodes::HTTP_OK;
        $this->transactions = array();
    }
 }

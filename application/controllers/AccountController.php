@@ -37,13 +37,13 @@ class AccountController extends Zend_Rest_Controller
  
     public function listAction()
     {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
 
     public function headAction()
     {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
 
@@ -54,7 +54,7 @@ class AccountController extends Zend_Rest_Controller
         $id = $this->_getParam('id');
         if(strval(intval($id)) != strval($id))
         {
-            $msg->status = 406;            
+            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
         }
         else 
         {
@@ -66,7 +66,9 @@ class AccountController extends Zend_Rest_Controller
                 $msg->id = $data->getId();
                 $msg->owner = $data->getOwner();
                 $msg->balance = $data->getBalance();
-                $msg->status = 200;
+            }
+            else {
+                $msg->status = Kilosoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;                            
             }
         }
         $this->view->msg = $msg;        
@@ -74,11 +76,11 @@ class AccountController extends Zend_Rest_Controller
     }
  
     public function newAction() {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     public function postAction() {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
         
         //$this->getParams() or $this->getParam('yourvar');
@@ -89,15 +91,15 @@ class AccountController extends Zend_Rest_Controller
 	$this->_forward('index');
     }
     public function editAction() { 
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     public function putAction() {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     } 
     public function deleteAction() {
-        $this->getResponse()->setHttpResponseCode(500);        
+        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
 }
