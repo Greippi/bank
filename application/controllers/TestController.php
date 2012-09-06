@@ -8,6 +8,7 @@ class TestController extends Zend_Rest_Controller{
         //$client->setRawData($json, 'application/json')->request('get');
         
         $client = new Zend_Http_Client('http://localhost:10082/transaction/');
+        $client->setHeaders('joo', 'JooParam');        
         $client->setMethod(Zend_Http_Client::POST);
         $client->setParameterPost('operation', 'withdraw');
         $client->setParameterPost('description', 'ATM withdraw');        
