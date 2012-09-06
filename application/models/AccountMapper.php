@@ -41,42 +41,51 @@ class Application_Model_AccountMapper
     }
     
     public function fetchAll() {
-        $resultSet = $this->getDbTable()->fetchAll();
-        $entries   = array();
-        foreach ($resultSet as $row) {
-            $entry = new Application_Model_Account();
+        try{                        
+            $resultSet = $this->getDbTable()->fetchAll();
+            $entries   = array();
+            foreach ($resultSet as $row) {
+                $entry = new Application_Model_Account();
             
-            $entry->setId($row->account_id)
-                  ->setBalance($row->balance)
-                  ->setOwner($row->owner);
-            $entries[] = $entry;
+                $entry->setId($row->account_id)
+                      ->setBalance($row->balance)
+                      ->setOwner($row->owner);
+                $entries[] = $entry;
+            }
+            return $entries;
+        } catch (Exception $e) {
+            error_log ('BANK::ERROR: '.$e, 0);            
+            return -100;
         }
-        return $entries;
     }
     
     public function fetchAccount($id) {  
         $entry = NULL;        
-        $table = $this->getDbTable();
-        $rows = $table->find((int)$id);
-        if(isset($rows))
-        {
-            foreach ($rows as $row) {  
-                $entry = new Application_Model_Account();
-                $entry->setId($row->account_id)
-                      ->setBalance($row->balance)
-                      ->setOwner($row->owner);
+        try{                        
+            $table = $this->getDbTable();
+            $rows = $table->find((int)$id);
+            if(isset($rows))
+            {
+                foreach ($rows as $row) {  
+                    $entry = new Application_Model_Account();
+                    $entry->setId($row->account_id)
+                          ->setBalance($row->balance)
+                        ->setOwner($row->owner);
+                }
+                return $entry;
             }
-            return $entry;
+        } catch (Exception $e) {
+            error_log ('BANK::ERROR: '.$e, 0);            
+            return NULL;
         }
     }  
     
     public function updateAccount($id, $balance) {    
         $table = $this->getDbTable();        
-        $data = array(
-            'balance' => $balance
-        );
+        $data = array('balance' => $balance);
         $where['account_id = ?'] = $id;
         $table->update($data, $where);
+        return TRUE;
     }  
 }
 

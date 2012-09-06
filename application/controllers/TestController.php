@@ -2,20 +2,19 @@
 <?php
 class TestController extends Zend_Rest_Controller{
     public function getAction(){
-        $datax = array(
-            'userID'      => 'a7664093-502e-4d2b-bf30-25a2b26d6021',
-            'itemKind'    => 0,
-            'value'       => 1,
-            'description' => 'Boa saudaÁ„o.',
-            'itemID'      => '03e76d0a-8bab-11e0-8250-000c29b481aa'
-            
-        );
-
-        $json = json_encode($datax);
-        $client = new Zend_Http_Client('http://localhost:10082/transaction/?format=json');
-        $data = $client->setRawData($json, 'application/json')->request('post');        
-        die;
+        //If sending data as raw encode
+        //$json = json_encode($datax);
+        //$adata = $client->setRawData($json, 'application/json')->request('post');        
         //$client->setRawData($json, 'application/json')->request('get');
+        
+        $client = new Zend_Http_Client('http://localhost:10082/transaction/');
+        $client->setMethod(Zend_Http_Client::POST);
+        $client->setParameterPost('operation', 'withdraw');
+        $client->setParameterPost('description', 'ATM withdraw');        
+        $client->setParameterPost('sum', '100');
+        $client->setParameterPost('accountid', '1');
+        $response = $client->request();        
+        echo $response;
         exit;
     }
 

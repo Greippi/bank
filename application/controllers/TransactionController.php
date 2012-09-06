@@ -72,44 +72,65 @@ class TransactionController extends Zend_Rest_Controller
     }
     
     public function postAction() {
- /*        $body = $this->getRequest()->getRawBody();
-        $transaction = Zend_Json::decode($body);
-        if(isset($transaction)){
-            $this->getResponse()->setHttpResponseCode(200);
-        }
-        else{
+        $action = $this->getRequest()->getParam('operation');
+        $amount = $this->getRequest()->getParam('sum');
+        $accountId = $this->getRequest()->getParam('accountid');
+        $description = $this->getRequest()->getParam('description');        
+        if(!isset($description)){
+            $description = '';
+        }        
+        
+        if(!isset($action) || !isset($amount) || !isset($accountId)){
             $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Invalid parameters' );
+            exit( 'Invalid or missing parameters' );
+        }
+        if(strval(intval($accountId)) != strval($accountId))
+        {
+            $this->getResponse()->setHttpResponseCode(406);
+            exit( 'Invalid account ID parameter' );            
+        }
+        if(strval(floatval($accountId)) != strval($accountId))
+        {
+            $this->getResponse()->setHttpResponseCode(406);
+            exit( 'Invalid sum parameter' );            
+        }
+        if($action != 'withdraw' && $action != 'deposit')
+        {
+            $this->getResponse()->setHttpResponseCode(406);
+            exit( 'Invalid operation type parameter' );            
         }
         
+        if($action == 'withdraw'){
+            $amount = -$amount;
+        }
+
         $account = new Application_Model_AccountMapper();
-        $data = $account->fetchAccount(1);
+        $data = $account->fetchAccount($accountId);
         if(!isset($data)){
             $this->getResponse()->setHttpResponseCode(406);
             exit( 'Account not found' );
         }
-        $oldBalance = $data->getBalance();
-        if($oldBalance < 100){
-            $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Not enought credit' );
-        }*/
-        $amount = -100;        
-        $id = 1;
-        $account = new Application_Model_AccountMapper();
-        $data = $account->fetchAccount(1);
-        if(!isset($data)){
-            $this->getResponse()->setHttpResponseCode(406);
-            exit( 'Account not found' );
-        }
+
         $oldBalance = $data->getBalance();        
         if($amount < 0 && ($oldBalance + $amount < 0)){
             $this->getResponse()->setHttpResponseCode(406);
             exit( 'Not enought credit' );
         }
         
-        $account->updateAccount($id, $oldBalance + $amount);
-        $transaction = new Application_Model_TransactionMapper();
-        $transaction->createTransaction($id, $id, uniqid(), $amount, '');
+        try{
+            $db = Zend_Db_Table::getDefaultAdapter();
+            $db->beginTransaction();
+            $account->updateAccount($accountId, $oldBalance + $amount);
+            $transaction = new Application_Model_TransactionMapper();
+            $transaction->createTransaction($accountId, $accountId, uniqid(), $amount, $description);
+            $db->commit();        
+        } catch (Exception $e) {
+            error_log ('BANK::ERROR: '.$e, 0);                        
+            $db->rollBack();                    
+            $this->getResponse()->setHttpResponseCode(500);
+            exit( 'Failed to save to database' );            
+        }
+        
         
         $this->getResponse()->setHttpResponseCode(200);        
         exit();

@@ -47,58 +47,66 @@ class Application_Model_TransactionMapper
     protected $_done;	
     
     public function fetchAll() {
-        $resultSet = $this->getDbTable()->fetchAll();
-        $entries   = array();
-        foreach ($resultSet as $row) {
-            $entry = new Application_Model_Transaction();
+        try{
+            $resultSet = $this->getDbTable()->fetchAll();
+            $entries   = array();
+            foreach ($resultSet as $row) {
+                $entry = new Application_Model_Transaction();
             
-            $entry->setId($row->transaction_id)
-                    ->setAccount($row->account)
-                    ->setTarget($row->target)
-                    ->setReference($row->reference)			
-                    ->setAmount($row->amount)
-                    ->setDescription($row->description)
-                    ->setDone($row->done);
-            $entries[] = $entry;
+                $entry->setId($row->transaction_id)
+                        ->setAccount($row->account)
+                        ->setTarget($row->target)
+                        ->setReference($row->reference)			
+                        ->setAmount($row->amount)
+                        ->setDescription($row->description)
+                        ->setDone($row->done);
+                $entries[] = $entry;
+            }
+            return $entries;
+        } catch (Exception $e) {
+            error_log ('BANK::ERROR: '.$e, 0);
+            return NULL;
         }
-        return $entries;
     }
     
     public function fetchTransactionsById($id) {
-        $table = $this->getDbTable();
-        
-        $query = $table->select()
+        try{        
+            $entries = NULL;                    
+            $table = $this->getDbTable();
+            $query = $table->select()
                        ->where('account = :id' )
                        ->order('done DESC')
                        ->limit(10,0)
                        ->bind(array('id'=>$id));
-        $rows = $table->fetchAll($query);                
-        $entries = NULL;        
-        foreach ($rows as $row) {
-            $entry = new Application_Model_Transaction();
-            $entry->setId($row->transaction_id)
+            $rows = $table->fetchAll($query);                
+
+            foreach ($rows as $row) {
+                $entry = new Application_Model_Transaction();
+                $entry->setId($row->transaction_id)
                     ->setAccount($row->account)
                     ->setTarget($row->target)
                     ->setReference($row->reference)				  
                     ->setAmount($row->amount)
                     ->setDescription($row->description)
                     ->setDone($row->done);
-            $entries[] = $entry;
+                $entries[] = $entry;
+            }
+            return $entries;            
+        } catch (Exception $e) {
+            error_log ('BANK::ERROR: '.$e, 0);            
+            return NULL;
         }
-        return $entries;
     }
 
     public function createTransaction($account, $target, $reference, $amount, $description){
         $table = $this->getDbTable();    
         $data = array('account' => $account,
-		    'target' => $account,
-		    'reference' => $reference,
-		    'amount' => $amount,
-		    'description' => 'ATM');
+                'target' => $target,
+                'reference' => $reference,
+                'amount' => $amount,
+                'description' => $description);
         $table->insert($data);
-        return 1;
+        return TRUE;            
     }
-    
-    
 }
 
