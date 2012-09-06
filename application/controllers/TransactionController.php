@@ -90,7 +90,7 @@ class TransactionController extends Zend_Rest_Controller
         $description = $request->getHeader('description');        
         
         //Then try with post parameters        
-        if(!isset($operation) || empty($operation))
+        if(!isset($action) || empty($action))
             $action = $this->getRequest()->getParam('operation');
         if(!isset($amount) || empty($amount))            
             $amount = $this->getRequest()->getParam('sum');
