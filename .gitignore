@@ -1,3 +1,5 @@
 /nbproject/private/
 /HelloWorld/nbproject/private/
 /HelloWorld/build/
+/application/configs/application.ini
+.gitignore
