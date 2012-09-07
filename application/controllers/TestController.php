@@ -13,7 +13,7 @@ class TestController extends Zend_Rest_Controller{
         $client->setMethod(Zend_Http_Client::POST);
         $client->setParameterPost('operation', 'withdraw');
         $client->setParameterPost('description', 'ATM withdraw');        
-        $client->setParameterPost('sum', '100');
+        $client->setParameterPost('sum', '20');
         $client->setParameterPost('accountid', '1');
         $response = $client->request();        
         echo $response;
@@ -26,11 +26,14 @@ class TestController extends Zend_Rest_Controller{
      */ 
     public function indexAction()
     {
+        echo 'perkele';
+        $this->rer>_forward('list','test');    
+        echo 'jälkeen';
     }
  
     public function listAction()
     {
-        
+        echo 'list';
     }
     public function postAction()
     {

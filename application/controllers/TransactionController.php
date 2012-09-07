@@ -13,12 +13,12 @@ class TransactionController extends Zend_Rest_Controller
                ),
             )
          )
-         ->addActionContext('index', array('html','xml', 'json'))
+         ->addActionContext('get', array('html','xml', 'json'))
          ->setAutoJsonSerialization(false)
          ->initContext();  
         
         $this->_helper->contextSwitch()
-                      ->addActionContext('response', array('html', 'xml', 'json'))
+                      ->addActionContext('post', array('html', 'xml', 'json'))
                       ->setAutoJsonSerialization(false)
                       ->initContext();
         
@@ -50,29 +50,24 @@ class TransactionController extends Zend_Rest_Controller
         if(strval(intval($id)) != strval($id))
         {
             $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
-            $this->_forward('index');            
         }
-        else 
+        $transactions = new Application_Model_TransactionMapper();
+        $data = $transactions->fetchTransactionsById($id);    
+        if(isset($data) && count($data) > 0)
         {
-            $transactions = new Application_Model_TransactionMapper();
-            $data = $transactions->fetchTransactionsById($id);    
-            if(isset($data) && count($data) > 0)
-            {
-                foreach ($data as $item) {  
-                    $entry = array(
-                        'id' => $item->getId(),
-                        'account' => $item->getAccount(),
-                        'target' => $item->getTarget(),                
-                        'reference' => $item->getReference(), 				  
-                        'amount' => $item->getAmount(), 				                      
-                        'description' => $item->getDescription(), 				                                          
-                        'done' => $item->getDone()); 				                                                              
-                    $entries[] = $entry;                
-                }
-                $msg->transactions = $entries;
-            }  
+            foreach ($data as $item) {  
+                $entry = array(
+                    'id' => $item->getId(),
+                    'account' => $item->getAccount(),
+                    'target' => $item->getTarget(),                
+                    'reference' => $item->getReference(), 				  
+                    'amount' => $item->getAmount(), 				                      
+                    'description' => $item->getDescription(), 				                                          
+                    'done' => $item->getDone()); 				                                                              
+                $entries[] = $entry;                
+            }
+            $msg->transactions = $entries;
         }
-        $this->_forward('index');
     }
  
     public function newAction() { 
@@ -115,22 +110,22 @@ class TransactionController extends Zend_Rest_Controller
         
         if(!isset($action) || !isset($amount) || !isset($accountId)){
             $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_PARAMETERS;
-            $this->_forward('response');
+            $this->render();            
         }
         if(strval(intval($accountId)) != strval($accountId))
         {
             $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;
-            $this->_forward('response');
+            $this->render();            
         }
         if(strval(floatval($amount)) != strval($amount))
         {
             $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_AMOUNT_PARAM;
-            $this->_forward('response');
+            $this->render();            
         }
         if($action != 'withdraw' && $action != 'deposit')
         {
             $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACTION_PARAM;
-            $this->_forward('response');
+            $this->render();            
         }
         
         if($action == 'withdraw'){
@@ -141,13 +136,13 @@ class TransactionController extends Zend_Rest_Controller
         $data = $account->fetchAccount($accountId);
         if(!isset($data)){
             $msg->status = Kilosoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
-            $this->_forward('response');
+            $this->render();            
         }
-
         $oldBalance = $data->getBalance();        
-        if(($amount < 0) && (($oldBalance + $amount) < 0)){
+        
+        if(($amount < 0) && (($oldBalance + $amount) <= 0)){
             $msg->status = Kilosoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
-            $this->_forward('response');
+            $this->render();
         }
         
         try{
@@ -157,13 +152,11 @@ class TransactionController extends Zend_Rest_Controller
             $transaction = new Application_Model_TransactionMapper();
             $transaction->createTransaction($accountId, $accountId, uniqid(), $amount, $description);
             $db->commit();  
-            $msg->status = Kilosoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
-            $this->_forward('response');
+            $msg->status = Kilosoft_ErrorCodes::HTTP_OK;
         } catch (Exception $e) {
             error_log ('BANK::ERROR: '.$e, 0);                        
             $db->rollBack();                    
             $response->status = Kilosoft_ErrorCodes::ERR_DB_SAVE_FAILED;
-            $this->_forward('response');
         }
     }
     

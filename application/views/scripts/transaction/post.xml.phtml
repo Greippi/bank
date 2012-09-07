@@ -1,0 +1,15 @@
+<?php
+    $doc = new DOMDocument();
+    $doc->formatOutput = true;
+    $root_element = $doc->createElement("response");
+    $doc->appendChild($root_element);
+    $accountElement = $doc->createElement("status");
+    $accountElement->appendChild($doc->createTextNode($this->msg->status));
+    $root_element->appendChild($accountElement);
+    $accountElement = $doc->createElement("info");
+    $accountElement->appendChild($doc->createTextNode($this->msg->info));
+    $root_element->appendChild($accountElement);
+    print $doc->saveXML();
+    exit;
+?>
+
