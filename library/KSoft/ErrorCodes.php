@@ -1,16 +1,10 @@
 <?php
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of ErrorCodes
  *
  * @author reino.hanninen
  */
-class Kilosoft_ErrorCodes {
+class KSoft_ErrorCodes {
     const HTTP_OK = 200;
     const ERR_HTTP_FAIL = 400;    
     const ERR_INVALID_PARAMETERS = -1;
