@@ -1,0 +1,22 @@
+<?php
+    $doc = new DOMDocument();
+    $doc->formatOutput = true;
+    $root_element = $doc->createElement("response");
+    $doc->appendChild($root_element);
+
+    $accountElement = $doc->createElement("status");
+    $accountElement->appendChild($doc->createTextNode($this->msg->status));
+    $root_element->appendChild($accountElement);
+
+    $transactionsElement = $doc->createElement("transactions");
+    while(list($key, $val) = each($this->msg->transactions)){
+        $transactionElement = $doc->createElement("transaction");           
+        while(list($keys, $vals) = each($val)){            
+            $transactionElement->setAttribute($keys, $vals);        
+        }
+        $transactionsElement->appendChild($transactionElement);    
+    }
+    $root_element->appendChild($transactionsElement);
+    print $doc->saveXML();
+    exit;
+?>

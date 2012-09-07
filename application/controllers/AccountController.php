@@ -15,11 +15,11 @@ class AccountController extends Zend_Rest_Controller
              'html', array(
                  'suffix'    => 'html',
                  'headers'   => array(
-                     'Content-Type' => 'text/html; Charset=UTF-8',
-                 ),
+                 'Content-Type' => 'text/html; Charset=UTF-8',
+                ),
              )
          )
-         ->addActionContext('index', array('html','xml', 'json'))
+         ->addActionContext('get', array('html','xml', 'json'))
          ->setAutoJsonSerialization(false)
          ->initContext();          
          
@@ -72,7 +72,6 @@ class AccountController extends Zend_Rest_Controller
             }
         }
         $this->view->msg = $msg;        
-        $this->_forward('index');
     }
  
     public function newAction() {
@@ -86,9 +85,6 @@ class AccountController extends Zend_Rest_Controller
         //$this->getParams() or $this->getParam('yourvar');
         $body = $this->getRequest()->getRawBody();
         $data = Zend_Json::decode($body);
-        var_dump($data);
-        die;
-	$this->_forward('index');
     }
     public function editAction() { 
         $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
