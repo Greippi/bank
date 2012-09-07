@@ -145,7 +145,7 @@ class TransactionController extends Zend_Rest_Controller
         }
 
         $oldBalance = $data->getBalance();        
-        if($amount < 0 && ($oldBalance + $amount < 0)){
+        if(($amount < 0) && (($oldBalance + $amount) < 0)){
             $msg->status = Kilosoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
             $this->_forward('response');
         }
