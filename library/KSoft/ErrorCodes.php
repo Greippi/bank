@@ -1,9 +1,5 @@
 <?php
-/**
- * Description of ErrorCodes
- *
- * @author reino.hanninen
- */
+
 class KSoft_ErrorCodes {
     const HTTP_OK = 200;
     const ERR_HTTP_FAIL = 400;    
