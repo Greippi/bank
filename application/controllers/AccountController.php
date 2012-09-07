@@ -37,24 +37,24 @@ class AccountController extends Zend_Rest_Controller
  
     public function listAction()
     {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
 
     public function headAction()
     {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
 
     
     public function getAction()
     {
-        $msg = new Kilosoft_AccountInfoMsg();
+        $msg = new KSoft_AccountInfoMsg();
         $id = $this->_getParam('id');
         if(strval(intval($id)) != strval($id))
         {
-            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
+            $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
         }
         else 
         {
@@ -68,18 +68,18 @@ class AccountController extends Zend_Rest_Controller
                 $msg->balance = $data->getBalance();
             }
             else {
-                $msg->status = Kilosoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;                            
+                $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;                            
             }
         }
         $this->view->msg = $msg;        
     }
  
     public function newAction() {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     public function postAction() {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
         
         //$this->getParams() or $this->getParam('yourvar');
@@ -87,15 +87,15 @@ class AccountController extends Zend_Rest_Controller
         $data = Zend_Json::decode($body);
     }
     public function editAction() { 
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     public function putAction() {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     } 
     public function deleteAction() {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
 }

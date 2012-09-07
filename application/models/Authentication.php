@@ -8,7 +8,7 @@
 /**
  * Description of UserAuthentication
  *
- * @author reino.hanninen
+ * 
  */
 class Application_Model_Authentication {
     //put your code here

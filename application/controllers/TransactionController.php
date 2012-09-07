@@ -38,18 +38,18 @@ class TransactionController extends Zend_Rest_Controller
     
     public function listAction()
     {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
  
     public function getAction()
     {
-        $msg = new Kilosoft_TransactionInfoMsg();
+        $msg = new KSoft_TransactionInfoMsg();
         $this->view->msg = $msg;                
         $id = $this->_getParam('id');
         if(strval(intval($id)) != strval($id))
         {
-            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
+            $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
         }
         $transactions = new Application_Model_TransactionMapper();
         $data = $transactions->fetchTransactionsById($id);    
@@ -71,7 +71,7 @@ class TransactionController extends Zend_Rest_Controller
     }
  
     public function newAction() { 
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     
@@ -85,7 +85,7 @@ class TransactionController extends Zend_Rest_Controller
     
     
     public function postAction() {
-        $msg = new Kilosoft_ResponseMsg();
+        $msg = new KSoft_ResponseMsg();
         $this->view->msg = $msg;         
 
         //Try first with header parameters
@@ -109,22 +109,22 @@ class TransactionController extends Zend_Rest_Controller
             $description = '';
         
         if(!isset($action) || !isset($amount) || !isset($accountId)){
-            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_PARAMETERS;
+            $msg->status = KSoft_ErrorCodes::ERR_INVALID_PARAMETERS;
             $this->render();            
         }
         if(strval(intval($accountId)) != strval($accountId))
         {
-            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;
+            $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;
             $this->render();            
         }
         if(strval(floatval($amount)) != strval($amount))
         {
-            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_AMOUNT_PARAM;
+            $msg->status = KSoft_ErrorCodes::ERR_INVALID_AMOUNT_PARAM;
             $this->render();            
         }
         if($action != 'withdraw' && $action != 'deposit')
         {
-            $msg->status = Kilosoft_ErrorCodes::ERR_INVALID_ACTION_PARAM;
+            $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACTION_PARAM;
             $this->render();            
         }
         
@@ -135,13 +135,13 @@ class TransactionController extends Zend_Rest_Controller
         $account = new Application_Model_AccountMapper();
         $data = $account->fetchAccount($accountId);
         if(!isset($data)){
-            $msg->status = Kilosoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
+            $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
             $this->render();            
         }
         $oldBalance = $data->getBalance();        
         
         if(($amount < 0) && (($oldBalance + $amount) <= 0)){
-            $msg->status = Kilosoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
+            $msg->status = KSoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
             $this->render();
         }
         
@@ -152,30 +152,30 @@ class TransactionController extends Zend_Rest_Controller
             $transaction = new Application_Model_TransactionMapper();
             $transaction->createTransaction($accountId, $accountId, uniqid(), $amount, $description);
             $db->commit();  
-            $msg->status = Kilosoft_ErrorCodes::HTTP_OK;
+            $msg->status = KSoft_ErrorCodes::HTTP_OK;
         } catch (Exception $e) {
             error_log ('BANK::ERROR: '.$e, 0);                        
             $db->rollBack();                    
-            $response->status = Kilosoft_ErrorCodes::ERR_DB_SAVE_FAILED;
+            $response->status = KSoft_ErrorCodes::ERR_DB_SAVE_FAILED;
         }
     }
     
     public function editAction() {    	 
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     public function putAction() {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     } 
     public function deleteAction() {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
 
     public function headAction()
     {
-        $this->getResponse()->setHttpResponseCode(Kilosoft_ErrorCodes::ERR_HTTP_FAIL);        
+        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
         exit('not implemented');
     }
     

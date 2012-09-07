@@ -1,12 +1,12 @@
 <?php
 
-class Kilosoft_TransactionInfoMsg
+class KSoft_TransactionInfoMsg
 {
     public $status;
     public $transactions;
     
    function __construct() {
-       $this->status = Kilosoft_ErrorCodes::HTTP_OK;
+       $this->status = KSoft_ErrorCodes::HTTP_OK;
        $this->transactions = array();
    }
 }
