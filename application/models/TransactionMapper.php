@@ -26,25 +26,8 @@ class Application_Model_TransactionMapper
     
     public function save(Application_Model_Transaction $Transaction)
     {
-        /*$data = array(
-            'email'   => $guestbook->getEmail(),
-            'comment' => $guestbook->getComment(),
-            'created' => date('Y-m-d H:i:s'),
-        );
- 
-        if (null === ($id = $guestbook->getId())) {
-            unset($data['id']);
-            $this->getDbTable()->insert($data);
-        } else {
-            $this->getDbTable()->update($data, array('id = ?' => $id));
-        }*/
     }
-    protected $_account;
-    protected $_target;
-    protected $_reference;
-    protected $_amount;
-    protected $_description;
-    protected $_done;	
+
     
     public function fetchAll() {
         try{
@@ -70,43 +53,53 @@ class Application_Model_TransactionMapper
     }
     
     public function fetchTransactionsById($id) {
-        try{        
-            $entries = NULL;                    
-            $table = $this->getDbTable();
-            $query = $table->select()
-                       ->where('account = :id' )
-                       ->order('done DESC')
-                       ->limit(10,0)
-                       ->bind(array('id'=>$id));
-            $rows = $table->fetchAll($query);                
+        $entries = NULL;                    
+        
+        //Check if account exists        
+        $account = new Application_Model_AccountMapper(); 
+        $data = $account->fetchAccount($id);
+        if(!isset($data))
+            throw new OutOfBoundsException();
+        
+        $table = $this->getDbTable();
+        $query = $table->select()
+                   ->where('account = :id' )
+                   ->order('done DESC')
+                   ->limit(10,0)
+                   ->bind(array('id'=>$id));
+        $rows = $table->fetchAll($query);                
 
-            foreach ($rows as $row) {
-                $entry = new Application_Model_Transaction();
-                $entry->setId($row->transaction_id)
-                    ->setAccount($row->account)
-                    ->setTarget($row->target)
-                    ->setReference($row->reference)				  
-                    ->setAmount($row->amount)
-                    ->setDescription($row->description)
-                    ->setDone($row->done);
-                $entries[] = $entry;
-            }
-            return $entries;            
-        } catch (Exception $e) {
-            error_log ('BANK::ERROR: '.$e, 0);            
-            return NULL;
+        foreach ($rows as $row) {
+            $entry = new Application_Model_Transaction();
+            $entry->setId($row->transaction_id)
+                ->setAccount($row->account)
+                ->setTarget($row->target)
+                ->setReference($row->reference)				  
+                ->setAmount($row->amount)
+                ->setDescription($row->description)
+                ->setDone($row->done);
+            $entries[] = $entry;
         }
+        return $entries;            
     }
 
-    public function createTransaction($account, $target, $reference, $amount, $description){
-        $table = $this->getDbTable();    
-        $data = array('account' => $account,
-                'target' => $target,
-                'reference' => $reference,
-                'amount' => $amount,
-                'description' => $description);
-        $table->insert($data);
-        return TRUE;            
+    public function createTransaction($accountId, $target, $reference, $amount, $description){
+        $db = Zend_Db_Table::getDefaultAdapter();        
+        try{
+            $db->beginTransaction();            
+            $account = new Application_Model_AccountMapper();            
+            $account->updateAccount($accountId, $amount);
+            $table = $this->getDbTable();    
+            $data = array('account' => $accountId,
+                    'target' => $target,
+                    'reference' => $reference,
+                    'amount' => $amount,
+                    'description' => $description);
+            $table->insert($data);
+        } catch (Exception $e) {
+            $db->rollBack();                    
+            throw $e;
+        }
     }
 }
 

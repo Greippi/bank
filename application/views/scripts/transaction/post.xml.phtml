@@ -1,4 +1,5 @@
 <?php
+    header("Content-Type: application/xml");
     $doc = new DOMDocument();
     $doc->formatOutput = true;
     $root_element = $doc->createElement("response");
