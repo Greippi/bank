@@ -96,6 +96,7 @@ class Application_Model_TransactionMapper
                     'amount' => $amount,
                     'description' => $description);
             $table->insert($data);
+            $db->commit();                        
         } catch (Exception $e) {
             $db->rollBack();                    
             throw $e;

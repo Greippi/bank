@@ -61,6 +61,7 @@ class TransactionController extends Zend_Rest_Controller
             $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
             $this->render();            
         }
+        
         if(isset($data) && count($data) > 0)
         {
             foreach ($data as $item) {  
@@ -93,8 +94,6 @@ class TransactionController extends Zend_Rest_Controller
     
     
     public function postAction() {
-        throw new KSoft_KErrorTest('ÖRGÖRG');        
-        
         $msg = new KSoft_ResponseMsg();
         $this->view->msg = $msg;         
 
