@@ -26,18 +26,6 @@ class Application_Model_AccountMapper
     
     public function save(Application_Model_Account $account)
     {
-        /*$data = array(
-            'email'   => $guestbook->getEmail(),
-            'comment' => $guestbook->getComment(),
-            'created' => date('Y-m-d H:i:s'),
-        );
- 
-        if (null === ($id = $guestbook->getId())) {
-            unset($data['id']);
-            $this->getDbTable()->insert($data);
-        } else {
-            $this->getDbTable()->update($data, array('id = ?' => $id));
-        }*/
     }
     
     public function fetchAll() {
@@ -80,12 +68,12 @@ class Application_Model_AccountMapper
         }
     }  
     
-    public function updateAccount($id, $balance) {    
+    public function updateAccount($id, $amount) {    
         $table = $this->getDbTable();        
-        $data = array('balance' => $balance);
+        $account = $this->fetchAccount($id);
+        $data = array('balance' => $account->getBalance() + $amount);
         $where['account_id = ?'] = $id;
         $table->update($data, $where);
-        return TRUE;
     }  
 }
 

@@ -51,8 +51,16 @@ class TransactionController extends Zend_Rest_Controller
         {
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
         }
-        $transactions = new Application_Model_TransactionMapper();
-        $data = $transactions->fetchTransactionsById($id);    
+        
+        try
+        {
+            $transactions = new Application_Model_TransactionMapper();
+            $data = $transactions->fetchTransactionsById($id);    
+        }
+        catch(OutOfBoundsException $e){
+            $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
+            $this->render();            
+        }
         if(isset($data) && count($data) > 0)
         {
             foreach ($data as $item) {  
@@ -85,6 +93,8 @@ class TransactionController extends Zend_Rest_Controller
     
     
     public function postAction() {
+        throw new KSoft_KErrorTest('ÖRGÖRG');        
+        
         $msg = new KSoft_ResponseMsg();
         $this->view->msg = $msg;         
 
@@ -144,20 +154,8 @@ class TransactionController extends Zend_Rest_Controller
             $msg->status = KSoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
             $this->render();
         }
-        
-        try{
-            $db = Zend_Db_Table::getDefaultAdapter();
-            $db->beginTransaction();
-            $account->updateAccount($accountId, $oldBalance + $amount);
-            $transaction = new Application_Model_TransactionMapper();
-            $transaction->createTransaction($accountId, $accountId, uniqid(), $amount, $description);
-            $db->commit();  
-            $msg->status = KSoft_ErrorCodes::HTTP_OK;
-        } catch (Exception $e) {
-            error_log ('BANK::ERROR: '.$e, 0);                        
-            $db->rollBack();                    
-            $response->status = KSoft_ErrorCodes::ERR_DB_SAVE_FAILED;
-        }
+        $transaction = new Application_Model_TransactionMapper();
+        $transaction->createTransaction($accountId, $accountId, uniqid(), $amount, $description);
     }
     
     public function editAction() {    	 
