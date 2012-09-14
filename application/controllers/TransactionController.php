@@ -51,11 +51,18 @@ class TransactionController extends Zend_Rest_Controller
         {
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
         }
+        $limit = $this->_getParam('limit');        
+        $offset = $this->_getParam('offset');      
         
+        if(!isset($limit) || (strval(intval($limit)) != strval($limit)) || $limit < 0)        
+            $limit = NULL;                
+        if(!isset($offset) || (strval(intval($offset)) != strval($offset)) || $offset < 0)        
+            $offset = NULL;                
+
         try
         {
             $transactions = new Application_Model_TransactionMapper();
-            $data = $transactions->fetchTransactionsById($id);    
+            $data = $transactions->fetchTransactionsById($id, $offset, $limit);    
         }
         catch(OutOfBoundsException $e){
             $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
@@ -95,7 +102,9 @@ class TransactionController extends Zend_Rest_Controller
     
     public function postAction() {
         $msg = new KSoft_ResponseMsg();
-        $this->view->msg = $msg;         
+        $this->view->msg = $msg;    
+        $limit = NULL;
+        $offset = NULL;
 
         //Try first with header parameters
         //Apache way to do it $action = $this-> getFrontController()-> getRequest()->getHeader('operation');        
@@ -131,6 +140,7 @@ class TransactionController extends Zend_Rest_Controller
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_AMOUNT_PARAM;
             $this->render();            
         }
+        
         if($action != 'withdraw' && $action != 'deposit')
         {
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACTION_PARAM;

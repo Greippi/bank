@@ -52,20 +52,26 @@ class Application_Model_TransactionMapper
         }
     }
     
-    public function fetchTransactionsById($id) {
+    public function fetchTransactionsById($id, $offset, $limit) {
         $entries = NULL;                    
+        $loc_offset = 0;
+        $loc_limit = 10;
         
         //Check if account exists        
         $account = new Application_Model_AccountMapper(); 
         $data = $account->fetchAccount($id);
         if(!isset($data))
             throw new OutOfBoundsException();
+        if(isset($offset))
+            $loc_offset = $offset;
+        if(isset($limit))
+            $loc_limit = $limit;
         
         $table = $this->getDbTable();
         $query = $table->select()
                    ->where('account = :id' )
                    ->order('done DESC')
-                   ->limit(10,0)
+                   ->limit(intval($loc_limit),  intval($loc_offset))
                    ->bind(array('id'=>$id));
         $rows = $table->fetchAll($query);                
 
