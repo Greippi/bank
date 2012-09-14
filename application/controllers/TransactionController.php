@@ -112,6 +112,7 @@ class TransactionController extends Zend_Rest_Controller
         $action = $request->getHeader('operation');
         $amount = $request->getHeader('sum');
         $accountId = $request->getHeader('accountid');
+        $targetId = $request->getHeader('targetid');        
         $description = $request->getHeader('description');        
 
         //Then try with post parameters        
@@ -121,12 +122,14 @@ class TransactionController extends Zend_Rest_Controller
             $amount = $this->getRequest()->getParam('sum');
         if(!isset($accountId) || empty($accountId))                    
             $accountId = $this->getRequest()->getParam('accountid');
+        if(!isset($targetId) || empty($targetId))                    
+            $targetId = $this->getRequest()->getParam('targetid');
         if(!isset($description) || empty($description))                    
             $description = $this->getRequest()->getParam('description');        
         if(!isset($description) || empty($description))
             $description = '';
-        
-        if(!isset($action) || !isset($amount) || !isset($accountId)){
+
+        if(!isset($action) || !isset($amount) || !isset($accountId) || !isset($targetId)){
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_PARAMETERS;
             $this->render();            
         }
@@ -150,7 +153,7 @@ class TransactionController extends Zend_Rest_Controller
         if($action == 'withdraw'){
             $amount = -$amount;
         }
-
+        
         $account = new Application_Model_AccountMapper();
         $data = $account->fetchAccount($accountId);
         if(!isset($data)){
@@ -158,13 +161,22 @@ class TransactionController extends Zend_Rest_Controller
             $this->render();            
         }
         $oldBalance = $data->getBalance();        
-        
         if(($amount < 0) && (($oldBalance + $amount) <= 0)){
             $msg->status = KSoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE;
             $this->render();
         }
+        
+        
+        if($accountId != $targetId){
+            $data = $account->fetchAccount($targetId);
+            if(!isset($data)){
+                $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
+                $this->render();            
+            }        
+        }
+        
         $transaction = new Application_Model_TransactionMapper();
-        $transaction->createTransaction($accountId, $accountId, uniqid(), $amount, $description);
+        $transaction->createTransaction($accountId, $targetId, uniqid(), $amount, $description);
     }
     
     public function editAction() {    	 

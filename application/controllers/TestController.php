@@ -7,23 +7,19 @@ class TestController extends Zend_Rest_Controller{
         //$adata = $client->setRawData($json, 'application/json')->request('post');        
         //$client->setRawData($json, 'application/json')->request('get');
         
-        $client = new Zend_Http_Client('http://localhost:10082/transaction/1?format=json&offset=0&limit=3');
-        $client->setHeaders('joo', 'JooParam');        
+        $client = new Zend_Http_Client('http://localhost:10082/transaction/');
 
-        $client->setMethod(Zend_Http_Client::GET);        
+/*        $client->setMethod(Zend_Http_Client::GET);        
         //$client->setParameterGet("format", "xml");        
         $client->setParameterGet("offset", "0");                
-        $client->setParameterGet("limit", "3");                        
+        $client->setParameterGet("limit", "3");                        */
         
-/*        
-        $client->setParameterPost("format", "xml");        
-        $client->setParameterPost("offset", "0");                
-        $client->setParameterPost("limit", "3");                        
         $client->setMethod(Zend_Http_Client::POST);
         $client->setParameterPost('operation', 'withdraw');
         $client->setParameterPost('description', 'ATM withdraw');        
-        $client->setParameterPost('sum', '20');
-        $client->setParameterPost('accountid', '1');*/
+        $client->setParameterPost('sum', '200');
+        $client->setParameterPost('accountid', '1');
+        $client->setParameterPost('targetid', '2');        
         $response = $client->request();        
         echo $response;
         exit;

@@ -69,7 +69,7 @@ class Application_Model_TransactionMapper
         
         $table = $this->getDbTable();
         $query = $table->select()
-                   ->where('account = :id' )
+                   ->where('account = :id or target = :id' )
                    ->order('done DESC')
                    ->limit(intval($loc_limit),  intval($loc_offset))
                    ->bind(array('id'=>$id));
@@ -78,26 +78,37 @@ class Application_Model_TransactionMapper
         foreach ($rows as $row) {
             $entry = new Application_Model_Transaction();
             $entry->setId($row->transaction_id)
-                ->setAccount($row->account)
-                ->setTarget($row->target)
-                ->setReference($row->reference)				  
-                ->setAmount($row->amount)
-                ->setDescription($row->description)
-                ->setDone($row->done);
+            ->setAccount($row->account)
+            ->setTarget($row->target)
+            ->setReference($row->reference);
+            
+            //if transferred to current account then show positive amount
+            if($id == $row->target && $row->account != $row->target)
+                $entry->setAmount(-$row->amount);
+            else
+                $entry->setAmount($row->amount);                
+            $entry->setDescription($row->description);
+            $entry->setDone($row->done);
             $entries[] = $entry;
         }
         return $entries;            
     }
 
-    public function createTransaction($accountId, $target, $reference, $amount, $description){
+    public function createTransaction($accountId, $targetId, $reference, $amount, $description){
         $db = Zend_Db_Table::getDefaultAdapter();        
         try{
             $db->beginTransaction();            
             $account = new Application_Model_AccountMapper();            
             $account->updateAccount($accountId, $amount);
+            
+            //Only update target account if operation is withdraw from customer
+            //account. Money cannot be withdrawn from target account
+            if($accountId != $targetId && $amount < 0)
+                $account->updateAccount($targetId, -$amount);            
+            
             $table = $this->getDbTable();    
             $data = array('account' => $accountId,
-                    'target' => $target,
+                    'target' => $targetId,
                     'reference' => $reference,
                     'amount' => $amount,
                     'description' => $description);
