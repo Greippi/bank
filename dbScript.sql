@@ -3,9 +3,33 @@ CREATE DATABASE `kassakaappi` /*!40100 DEFAULT CHARACTER SET utf8 */;
 CREATE TABLE `account` (
   `account_id` int(11) NOT NULL AUTO_INCREMENT,
   `balance` float NOT NULL DEFAULT '0',
-  `owner` varchar(45) NOT NULL,
   PRIMARY KEY (`account_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `session` (
+  `account_id` int(11) NOT NULL,
+  `originator` varchar(45) NOT NULL,
+  `session` varchar(45) NOT NULL,
+  `valid` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`account_id`,`originator`),
+  UNIQUE KEY `session_UNIQUE` (`session`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `firstname` varchar(45) NOT NULL,
+  `lastname` varchar(45) NOT NULL,
+  `passwordsalt` varchar(45) NOT NULL,
+  `loginname` varchar(45) NOT NULL,
+  `passwordhash` varchar(45) NOT NULL,
+  `accountid` int(11) NOT NULL,
+  `salt` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`),
+  KEY `loginname` (`loginname`),
+  KEY `account_id` (`accountid`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8
+
 
 CREATE TABLE `transaction` (
   `transaction_id` int(11) NOT NULL AUTO_INCREMENT,
