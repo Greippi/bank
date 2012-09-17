@@ -2,7 +2,7 @@
 
 class TransactionController extends Zend_Rest_Controller
 {
-	public function init()
+    public function init()
     {
         $this->_helper->contextSwitch()
             ->setContext(
@@ -47,6 +47,12 @@ class TransactionController extends Zend_Rest_Controller
         $msg = new KSoft_TransactionInfoMsg();
         $this->view->msg = $msg;                
         $id = $this->_getParam('id');
+        $sessionId = $this->_getParam('sessionid');
+        if(!isset($sessionId) || $sessionId == "")
+        {
+            $msg->status = KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
+            $this->render();
+        }
         if(strval(intval($id)) != strval($id))
         {
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
@@ -97,8 +103,6 @@ class TransactionController extends Zend_Rest_Controller
         $request = new Zend_Controller_Request_Http();
         $key = $request->getHeader('x-apikey');
     }*/
-
-    
     
     public function postAction() {
         $msg = new KSoft_ResponseMsg();
@@ -113,7 +117,8 @@ class TransactionController extends Zend_Rest_Controller
         $amount = $request->getHeader('sum');
         $accountId = $request->getHeader('accountid');
         $targetId = $request->getHeader('targetid');        
-        $description = $request->getHeader('description');        
+        $description = $request->getHeader('description');     
+        $sessionId = $this->getHeader('sessionid');
 
         //Then try with post parameters        
         if(!isset($action) || empty($action))
@@ -126,9 +131,16 @@ class TransactionController extends Zend_Rest_Controller
             $targetId = $this->getRequest()->getParam('targetid');
         if(!isset($description) || empty($description))                    
             $description = $this->getRequest()->getParam('description');        
-        if(!isset($description) || empty($description))
-            $description = '';
+        if(!isset($sessionId) || empty($sessionId))
+            $sessionId = $this->getRequest()->getParam('sessionid');        
 
+        
+        if(!isset($sessionId) || $sessionId == "")
+        {
+            $msg->status = KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
+            $this->render();
+        }
+        
         if(!isset($action) || !isset($amount) || !isset($accountId) || !isset($targetId)){
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_PARAMETERS;
             $this->render();            

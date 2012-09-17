@@ -51,27 +51,41 @@ class AccountController extends Zend_Rest_Controller
     public function getAction()
     {
         $msg = new KSoft_AccountInfoMsg();
+        $this->view->msg = $msg;                
         $id = $this->_getParam('id');
+        $sessionId = $this->_getParam('sessionid');
+        if(!isset($sessionId) || $sessionId == "")
+        {
+            $msg->status = KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
+            $this->render();
+        }
+        
         if(strval(intval($id)) != strval($id))
         {
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
+            $this->render();            
         }
-        else 
-        {
-            $account = new Application_Model_AccountMapper();
-            $data = $account->fetchAccount($id);    
+        
+        //Check valid session
+        $authentication = new Application_Model_AuthenticationMapper();
+        $status = $authentication->sessionAuthentication($id, $sessionId);
+        if($status != KSoft_ErrorCodes::AUTH_OK){
+            $msg->status = $status;
+            $this->render();
+        }
+        
+        $account = new Application_Model_AccountMapper();
+        $data = $account->fetchAccount($id);    
 
-            if(isset($data) && count($data) > 0)
-            {
-                $msg->id = $data->getId();
-                $msg->owner = $data->getOwner();
-                $msg->balance = $data->getBalance();
-            }
-            else {
-                $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;                            
-            }
+        if(isset($data) && count($data) > 0)
+        {
+            $msg->id = $data->getId();
+            $msg->owner = $data->getOwner();
+            $msg->balance = $data->getBalance();
         }
-        $this->view->msg = $msg;        
+        else {
+            $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;                            
+        }
     }
  
     public function newAction() {

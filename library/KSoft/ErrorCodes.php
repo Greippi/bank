@@ -2,6 +2,7 @@
 
 class KSoft_ErrorCodes {
     const HTTP_OK = 200;
+    const AUTH_OK = 200;    
     const ERR_HTTP_FAIL = 400;    
     const ERR_INVALID_PARAMETERS = -1;
     const ERR_INVALID_ACCOUNT_ID_PARAM = -2;    
@@ -10,7 +11,9 @@ class KSoft_ErrorCodes {
     const ERR_INSUFFICIENT_BALANCE = -5;                
     const ERR_DB_SAVE_FAILED = -6;                    
     const ERR_ACCOUNT_NOT_FOUND = -7;                        
-    
+    const ERR_AUTH_UNKNOWN = -8;
+    const ERR_AUTH_EXPIRED = -9;
+    const ERR_AUTH_UNKNOWN_ERROR = -10;    
 }
 
 ?>
