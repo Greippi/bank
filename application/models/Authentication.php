@@ -11,7 +11,6 @@
  * 
  */
 class Application_Model_Authentication {
-    //put your code here
-}
+}   
 
 ?>
