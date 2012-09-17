@@ -36,8 +36,7 @@ class Application_Model_AccountMapper
                 $entry = new Application_Model_Account();
             
                 $entry->setId($row->account_id)
-                      ->setBalance($row->balance)
-                      ->setOwner($row->owner);
+                      ->setBalance($row->balance);
                 $entries[] = $entry;
             }
             return $entries;
@@ -57,12 +56,13 @@ class Application_Model_AccountMapper
                 foreach ($rows as $row) {  
                     $entry = new Application_Model_Account();
                     $entry->setId($row->account_id)
-                          ->setBalance($row->balance)
-                        ->setOwner($row->owner);
+                          ->setBalance($row->balance);
                 }
                 return $entry;
             }
         } catch (Exception $e) {
+            echo $e;
+            die;
             error_log ('BANK::ERROR: '.$e, 0);            
             return NULL;
         }

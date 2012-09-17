@@ -57,26 +57,24 @@ class Application_Model_AuthenticationMapper {
  
     public function sessionAuthentication($accountId,$sessionId) {  
         
-        try{                        
+        try{   
             $table = $this->getSessionDbTable();
             $query = $table->select()
                    ->where('account_id = :p1')                    
                    ->where('session = :p2')
-                   ->where('TIME_TO_SEC(timediff(now(),valid)) / 60 <  500000')                    
+                   ->where('TIME_TO_SEC(timediff(now(),valid)) / 60 <  5')                    
                    ->bind(array('p1'=>$accountId,'p2'=>$sessionId));
             $row = $table->fetchRow($query);  
             
-            
             //update time stamp and return ok
-            if(!isset($row))
+            if(isset($row))
             {
                 $row->valid = new Zend_Db_Expr('NOW()');
                 $row->save();
                 return KSoft_ErrorCodes::AUTH_OK;
             }
+            return KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
         } catch (Exception $e) {
-            echo $e;
-            die;
             error_log ('BANK::ERROR: '.$e, 0);            
             return KSoft_ErrorCodes::ERR_AUTH_UNKNOWN_ERROR;    
         }

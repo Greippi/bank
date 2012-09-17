@@ -7,13 +7,13 @@ class TestController extends Zend_Rest_Controller{
         //$adata = $client->setRawData($json, 'application/json')->request('post');        
         //$client->setRawData($json, 'application/json')->request('get');
         
-        $client = new Zend_Http_Client('http://localhost:10082/authentication/');
+        $client = new Zend_Http_Client('http://localhost:10082/transaction/');
 
 /*        $client->setMethod(Zend_Http_Client::GET);        
         //$client->setParameterGet("format", "xml");        
         $client->setParameterGet("offset", "0");                
         $client->setParameterGet("limit", "3");                        */
-        
+/*        
         //test login
         $client->setMethod(Zend_Http_Client::POST);
         $client->setParameterPost('format', 'xml');                
@@ -24,19 +24,12 @@ class TestController extends Zend_Rest_Controller{
         $response = $client->request();        
         echo $response;
         exit;
-        
-        
-/*
-               $accountId = $request->getHeader('accountid');        
-        $loginname = $request->getHeader('login');
-        $password = $request->getHeader('password');
-        $originator = $request->getHeader('operator');   
-        
-        
-        
+  */      
         
         //Test withdraw
         $client->setMethod(Zend_Http_Client::POST);
+        $client->setParameterPost('sessionid', '5057017348a1b');                                
+        $client->setParameterPost('format', 'xml');                        
         $client->setParameterPost('operation', 'withdraw');
         $client->setParameterPost('description', 'ATM withdraw');        
         $client->setParameterPost('sum', '200');
@@ -46,7 +39,7 @@ class TestController extends Zend_Rest_Controller{
         echo $response;
         exit;
         
-  */      
+       
     }
 
     /**

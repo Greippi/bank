@@ -58,12 +58,13 @@ class AccountController extends Zend_Rest_Controller
         {
             $msg->status = KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
             $this->render();
+            exit();            
         }
         
         if(strval(intval($id)) != strval($id))
         {
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
-            $this->render();            
+            $this->render(); 
         }
         
         //Check valid session
