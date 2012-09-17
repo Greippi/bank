@@ -52,46 +52,63 @@ class Application_Model_TransactionMapper
         }
     }
     
-    public function fetchTransactionsById($id) {
+    public function fetchTransactionsById($id, $offset, $limit) {
         $entries = NULL;                    
+        $loc_offset = 0;
+        $loc_limit = 10;
         
         //Check if account exists        
         $account = new Application_Model_AccountMapper(); 
         $data = $account->fetchAccount($id);
         if(!isset($data))
             throw new OutOfBoundsException();
+        if(isset($offset))
+            $loc_offset = $offset;
+        if(isset($limit))
+            $loc_limit = $limit;
         
         $table = $this->getDbTable();
         $query = $table->select()
-                   ->where('account = :id' )
+                   ->where('account = :id or target = :id' )
                    ->order('done DESC')
-                   ->limit(10,0)
+                   ->limit(intval($loc_limit),  intval($loc_offset))
                    ->bind(array('id'=>$id));
         $rows = $table->fetchAll($query);                
 
         foreach ($rows as $row) {
             $entry = new Application_Model_Transaction();
             $entry->setId($row->transaction_id)
-                ->setAccount($row->account)
-                ->setTarget($row->target)
-                ->setReference($row->reference)				  
-                ->setAmount($row->amount)
-                ->setDescription($row->description)
-                ->setDone($row->done);
+            ->setAccount($row->account)
+            ->setTarget($row->target)
+            ->setReference($row->reference);
+            
+            //if transferred to current account then show positive amount
+            if($id == $row->target && $row->account != $row->target)
+                $entry->setAmount(-$row->amount);
+            else
+                $entry->setAmount($row->amount);                
+            $entry->setDescription($row->description);
+            $entry->setDone($row->done);
             $entries[] = $entry;
         }
         return $entries;            
     }
 
-    public function createTransaction($accountId, $target, $reference, $amount, $description){
+    public function createTransaction($accountId, $targetId, $reference, $amount, $description){
         $db = Zend_Db_Table::getDefaultAdapter();        
         try{
             $db->beginTransaction();            
             $account = new Application_Model_AccountMapper();            
             $account->updateAccount($accountId, $amount);
+            
+            //Only update target account if operation is withdraw from customer
+            //account. Money cannot be withdrawn from target account
+            if($accountId != $targetId && $amount < 0)
+                $account->updateAccount($targetId, -$amount);            
+            
             $table = $this->getDbTable();    
             $data = array('account' => $accountId,
-                    'target' => $target,
+                    'target' => $targetId,
                     'reference' => $reference,
                     'amount' => $amount,
                     'description' => $description);
