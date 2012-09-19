@@ -53,10 +53,20 @@ class TransactionController extends Zend_Rest_Controller
             $msg->status = KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
             $this->render();
         }
+
         if(strval(intval($id)) != strval($id))
         {
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
         }
+        
+        //Check valid session
+        $authentication = new Application_Model_AuthenticationMapper();
+        $status = $authentication->sessionAuthentication($id, $sessionId);
+        if($status != KSoft_ErrorCodes::AUTH_OK){
+            $msg->status = $status;
+            $this->render();
+        }
+        
         $limit = $this->_getParam('limit');        
         $offset = $this->_getParam('offset');      
         
@@ -118,7 +128,7 @@ class TransactionController extends Zend_Rest_Controller
         $accountId = $request->getHeader('accountid');
         $targetId = $request->getHeader('targetid');        
         $description = $request->getHeader('description');     
-        $sessionId = $this->getHeader('sessionid');
+        $sessionId = $request->getHeader('sessionid');
 
         //Then try with post parameters        
         if(!isset($action) || empty($action))
@@ -150,6 +160,15 @@ class TransactionController extends Zend_Rest_Controller
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;
             $this->render();            
         }
+        
+        //Check valid session
+        $authentication = new Application_Model_AuthenticationMapper();
+        $status = $authentication->sessionAuthentication($accountId, $sessionId);
+        if($status != KSoft_ErrorCodes::AUTH_OK){
+            $msg->status = $status;
+            $this->render();
+        }
+        
         if(strval(floatval($amount)) != strval($amount))
         {
             $msg->status = KSoft_ErrorCodes::ERR_INVALID_AMOUNT_PARAM;
