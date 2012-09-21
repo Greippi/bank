@@ -1,16 +1,30 @@
-<?php
-    header("Content-Type: application/xml");
+<?php    
     $doc = new DOMDocument();
-    $doc->formatOutput = true;
-    $root_element = $doc->createElement("response");
-    $doc->appendChild($root_element);
-    $accountElement = $doc->createElement("status");
-    $accountElement->appendChild($doc->createTextNode($this->msg->status));
-    $root_element->appendChild($accountElement);
-    $accountElement = $doc->createElement("info");
-    $accountElement->appendChild($doc->createTextNode($this->msg->info));
-    $root_element->appendChild($accountElement);
-    print $doc->saveXML();
-    exit;
+    
+    $doc->formatOutput = $this->format;            
+    
+    $responseElement = $doc->createElement("response");
+    
+    $status = $doc->createElement("status");
+    $status->appendChild($doc->createTextNode($this->msg['status']));
+    
+    $accounts = $doc->createElement("transactions");
+    
+    foreach($this->msg['transactions'] as $transaction) {       
+        $transactionElement = $doc->createElement('account');
+        
+        foreach($transaction as $key => $value ) {
+            $transactionElement->setAttribute($key,$value);    
+        }       
+        
+        $accounts->appendChild($transactionElement);
+    }
+        
+    $responseElement->appendChild($status);
+    $responseElement->appendChild($accounts);
+    
+    $doc->appendChild($responseElement);
+    
+    echo $doc->saveXML();   
 ?>
 

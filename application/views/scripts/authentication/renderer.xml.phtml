@@ -4,11 +4,11 @@
     $root_element = $doc->createElement("authentication");
     $doc->appendChild($root_element);
 
-    $accountElement = $doc->createElement("status");
-    $accountElement->appendChild($doc->createTextNode($this->msg->status));
-    $root_element->appendChild($accountElement);
-    $accountElement = $doc->createElement("info");
-    $accountElement->appendChild($doc->createTextNode($this->msg->info));
-    $root_element->appendChild($accountElement);
+    $transactionElement = $doc->createElement("status");
+    $transactionElement->appendChild($doc->createTextNode($this->msg->status));
+    $root_element->appendChild($transactionElement);
+    $transactionElement = $doc->createElement("info");
+    $transactionElement->appendChild($doc->createTextNode($this->msg->info));
+    $root_element->appendChild($transactionElement);
     print $doc->saveXML();    
 ?>

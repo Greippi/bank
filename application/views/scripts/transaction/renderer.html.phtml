@@ -1,19 +1,27 @@
-<?php
-    header("Content-Type: text/html");
-    echo '<!DOCTYPE html>';
-    echo '<html>';
-    echo '<body';
-    echo '<div id="transaction">';                  
-    echo 'status='.$this->msg->status.'<br>';    
-    reset($this->msg->transactions);
-    while(list($key, $val) = each($this->msg->transactions)){
-        while(list($keys, $vals) = each($val)){            
-            echo $keys.'='.$vals.'::';
-        }
-        echo '<br>';            
-    }
-    echo '</div>';                          
-    echo '</body>';
-    echo '</html>';
-    exit;
-?>
+<!DOCTYPE html>
+<html>
+<body   
+<div id="status"><?php echo $this->msg['status']; ?></div>    
+<div id="accounts">
+<table>
+    <thead>
+        <tr>
+        <?php foreach (Application_Model_Transaction::keys() as $key) : ?>
+            <td><?php echo $key; ?></td>
+        <?php endforeach; ?>    
+        </tr>
+    </thead>        
+    
+    <tbody>
+    <?php foreach ($this->msg['transactions'] as $transaction) : ?>
+        <tr>
+        <?php foreach ($transaction as $key => $value) : ?>
+            <td><?php echo $value; ?></td>
+        <?php endforeach; ?>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>    
+</table>    
+</div>                          
+</body>
+</html>

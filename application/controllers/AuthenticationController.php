@@ -1,6 +1,9 @@
 <?php
 /**
  * AuthenticationController make auchentications and provide sessionkeys.
+ * 
+ * @package controllers
+ * @category controllers
  */
 class AuthenticationController extends KSoft_BaseController {      
             
@@ -10,16 +13,16 @@ class AuthenticationController extends KSoft_BaseController {
     public function postAction() {                                   
         $loginName = $this->getParam('login');    
         $password = $this->getParam('password');        
-
-        $msg = new KSoft_ResponseMsg();
+        
+        $response = array('status' => 0);
         
         if($loginName && $password) {           
-            $authentication = new Application_Model_AuthenticationMapper();
-            $msg->status = $authentication->authenticate($loginName, $password);            
+            $authentication = new Application_Model_AuthenticationMapper();             
+             $response = $authentication->authenticate($loginName, $password);             
         } else {
-            $msg->status = KSoft_ErrorCodes::ERR_INVALID_PARAMETERS;
+             $response['status'] = KSoft_ErrorCodes::ERR_INVALID_PARAMETERS;
         }                        
-        
-        $this->view->msg = $msg;               
+                        
+        $this->view->msg = $response;               
     }       
 }

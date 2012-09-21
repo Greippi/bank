@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * ErrorController
+ * 
+ * TODO: refactor to use KSoft_BaseController
+ * 
+ * @package controllers
+ * @category controllers 
+ */
 class ErrorController extends Zend_Controller_Action
 {
 

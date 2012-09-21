@@ -1,6 +1,6 @@
 <?php
 /**
- * AccountController gives access to user accounts
+ * AccountController gives access to user accounts.
  *  
  * @package controllers
  * @category controllers
@@ -48,8 +48,8 @@ class AccountController extends KSoft_BaseController
         $accountID = $this->getParam('id');
         
         $accountMapper = new Application_Model_AccountMapper();            
-        $account = $accountMapper->fetchAccount($user, $accountID);
-
+        $account = $accountMapper->fetchAccount($user, $accountID);        
+        
         $accountsArray = array();
         
         if( $account ) {

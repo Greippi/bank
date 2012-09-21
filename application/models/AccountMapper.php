@@ -47,15 +47,8 @@ class Application_Model_AccountMapper
         $accounts = array();
         
         foreach ($resultSet as $row) {            
-            $user = $userMapper->get($row->user_id);
-            
-            $account = new Application_Model_Account();
-
-            $account->setId($row->account_id)
-                    ->setBalance($row->balance)
-                    ->setUser($user);
-            
-            $accounts[] = $account;
+            $user = $userMapper->get($row->user_id);            
+            $accounts[] = Application_Model_Account::toModel($row);                        
         }
         
         return $accounts;        
@@ -97,13 +90,13 @@ class Application_Model_AccountMapper
                 
         return Application_Model_Account::toModel($resultSet);
     }
- 
     
-    public function updateAccount($id, $amount) {    
-        $table = $this->getDbTable();        
-        $account = $this->fetchAccount($id);
-        $data = array('balance' => $account->getBalance() + $amount);
-        $where['account_id = ?'] = $id;
+    public function updateAccount(Application_Model_Account $account) {    
+        $table = $this->getDbTable();
+        
+        $data = array('balance' => $account->balance);        
+        $where['account_id = ?'] = $account->id;
+        
         $table->update($data, $where);
     }  
 }

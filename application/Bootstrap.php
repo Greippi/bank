@@ -30,9 +30,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     	return $request;        
     } 		
 
-        protected function _initSessionCheck() {
+    protected function _initSessionCheck() {
         $front = Zend_Controller_Front::getInstance();
         $front->registerPlugin(new KSoft_SessionCheck());
+    }
+    
+    protected function initLogger() {
+        //TODO: Copy Logger from dumpo
     }
 }
 

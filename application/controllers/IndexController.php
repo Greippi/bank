@@ -1,20 +1,13 @@
 <?php
 
-class IndexController extends Zend_Controller_Action
-{
-    
-    
-    
-    public function init()
-    {
-        
-    }
-
-    public function indexAction()
-    {
-        
-    }
-
+/**
+ * IndexController
+ * 
+ * TODO: Customize index actions, put some hellou messages here
+ * 
+ * @package controllers
+ * @category controllers 
+ */
+class IndexController extends KSoft_BaseController {
 
 }
-

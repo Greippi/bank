@@ -118,5 +118,10 @@ class Application_Model_Transaction
         
         return $array;
     }
+    
+    public static function keys() {
+        return array('id','account', 'target','reference',
+                       'amount','description','done');
+    }
 }
 

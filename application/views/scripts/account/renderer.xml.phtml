@@ -11,12 +11,12 @@
     $accounts = $doc->createElement("accounts");
     
     foreach($this->msg['accounts'] as $account) {       
-        $accountElement = $doc->createElement('account');
+        $transactionElement = $doc->createElement('account');
         
-        $accountElement->setAttribute('id',$account['id']);
-        $accountElement->setAttribute('balance',$account['balance']);
+        $transactionElement->setAttribute('id',$account['id']);
+        $transactionElement->setAttribute('balance',$account['balance']);
         
-        $accounts->appendChild($accountElement);
+        $accounts->appendChild($transactionElement);
     }
         
     $responseElement->appendChild($status);

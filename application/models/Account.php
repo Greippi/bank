@@ -1,10 +1,10 @@
 <?php
-
 class Application_Model_Account
 {
     public $_id; 
     public $_balance;
     public $_user;
+    public $_name;
     
     public function __set($name, $value)
     {
@@ -43,6 +43,15 @@ class Application_Model_Account
         return $this;
     }
     
+    public function setName($name) {
+        $this->_name = $name;
+        return $this;
+    }
+    
+    public function getName() {
+        return $this;
+    }
+    
     public function setBalance($balance) {
         $this->_balance = $balance;
         return $this;
@@ -63,13 +72,12 @@ class Application_Model_Account
     
     public function getBalance() {
         return $this->_balance;        
-    }
-    
-    
+    }   
     
     public function toArray() {
         $array = array('id' => $this->id, 
-                       'balance' => $this->_balance );        
+                       'balance' => $this->_balance,
+                       'name' => $this->_name );        
         
         if($this->_user) {
             $array['userid'] = $this->_user->id;
@@ -87,7 +95,8 @@ class Application_Model_Account
         $account = new Application_Model_Account();
         
         $account->setId($resultset->account_id)
-                ->setBalance($resultset->balance);
+                ->setBalance($resultset->balance)
+                ->setName($resultset->name);
         
         return $account;
     }

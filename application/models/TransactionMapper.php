@@ -105,24 +105,43 @@ class Application_Model_TransactionMapper
         return $entries;            
     }
 
-    public function createTransaction($accountId, $targetId, $reference, $amount, $description){
+    public function createTransaction(Application_Model_User $user, 
+                                      $accountId, 
+                                      $targetId, 
+                                      $reference, 
+                                      $amount, 
+                                      $description){
+        
         $db = Zend_Db_Table::getDefaultAdapter();        
+        
         try{
-            $db->beginTransaction();            
-            $account = new Application_Model_AccountMapper();            
-            $account->updateAccount($accountId, $amount);
+            $db->beginTransaction();
             
-            //Only update target account if operation is withdraw from customer
-            //account. Money cannot be withdrawn from target account
-            if($accountId != $targetId && $amount < 0)
-                $account->updateAccount($targetId, -$amount);            
+            $accountMapper = new Application_Model_AccountMapper();
             
+            $account = $accountMapper->fetchAccount($user, $accountId);
+            
+            if(!$account) {
+                throw new Exception('Trying to access non existing account',
+                                     KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND);
+            }
+            
+            $account->balance += $amount;
+            
+            if($account->balance < 0) {
+                throw new Exception('Insuffient balance', 
+                                    KSoft_ErrorCodes::ERR_INSUFFICIENT_BALANCE );
+            }
+            
+            $accountMapper->updateAccount($account);             
             $table = $this->getDbTable();    
-            $data = array('account' => $accountId,
-                    'target' => $targetId,
-                    'reference' => $reference,
-                    'amount' => $amount,
-                    'description' => $description);
+            
+            $data = array('account_id' => $accountId,
+                        'target_id' => $targetId,
+                        'reference' => $reference,
+                        'amount' => $amount,
+                        'description' => $description);
+            
             $table->insert($data);
             $db->commit();                        
         } catch (Exception $e) {

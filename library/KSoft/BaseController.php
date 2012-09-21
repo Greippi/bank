@@ -5,11 +5,14 @@
  */
 class KSoft_BaseController extends Zend_Rest_Controller {
     
-    public function init()  {        
+    public function init()  {     
+                        
         $html = array( 'suffix' => 'html',
                        'headers'   => array('Content-Type' => 'text/html; Charset=UTF-8'));                      
         
         $types = array( 'html', 'xml', 'json' );
+        
+        
         
          $this->_helper->contextSwitch()
                     ->setContext('html',$html )
@@ -26,6 +29,10 @@ class KSoft_BaseController extends Zend_Rest_Controller {
                       ->addActionContext('post', $types )
                       ->setAutoJsonSerialization(false)
                       ->initContext();
+        
+        if(!$this->hasParam('format') ) {
+            $this->_helper->contextSwitch()->initContext('json');
+        }
         
         $this->_helper->viewRenderer('renderer');                 
         
