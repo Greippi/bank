@@ -9,9 +9,8 @@
  * @property string $passwordhash md5 hashed password
  * @property string $salt password salt
  */
-class Application_Model_User
-{
-    
+class Application_Model_User extends KSoft_Model
+{    
     /**
      * @var int 
      */
@@ -48,25 +47,7 @@ class Application_Model_User
     /**
      * @var int 
      */
-    protected $_account;
-   
-    public function __set($name, $value)
-    {
-        $method = 'set' . $name;
-        if (('mapper' == $name) || !method_exists($this, $method)) {
-            throw new Exception('Invalid user property: ' . $name . ' value ' . $value);
-        }
-        $this->$method($value);
-    }    
-    
-    public function __get($name)
-    {
-        $method = 'get' . $name;
-        if (('mapper' == $name) || !method_exists($this, $method)) {
-            throw new Exception('Invalid user property: ' . $name );
-        }
-        return $this->$method();
-    }
+    protected $_account;    
      
     public function setId($id)
     {

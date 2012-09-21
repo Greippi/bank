@@ -3,7 +3,7 @@
 /**
  * Description of Session
  */
-class Application_Model_Session {
+class Application_Model_Session extends KSoft_Model {
     
     protected $_user;
     
@@ -43,26 +43,6 @@ class Application_Model_Session {
 
     public function setCreated($created) {
         $this->_created = $created;
-    }
-
-        
-        
-    public function __set($name, $value)
-    {
-        $method = 'set' . $name;
-        if (('mapper' == $name) || !method_exists($this, $method)) {
-            throw new Exception('Invalid session property: ' . $name . ' value ' . $value);
-        }
-        $this->$method($value);
-    }       
-    
-    public function __get($name)
-    {
-        $method = 'get' . $name;
-        if (('mapper' == $name) || !method_exists($this, $method)) {
-            throw new Exception('Invalid session property: ' . $name );
-        }
-        return $this->$method();
     }
     
     public static function toModel($resultSet) {
