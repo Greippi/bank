@@ -1,117 +1,62 @@
 <?php
-
-class AccountController extends Zend_Rest_Controller
-{
-    public function init()
-    {
-        //$bootstrap = $this->getInvokeArg('bootstrap');
-/*	$contextSwitch = $this->_helper->getHelper('contextSwitch');
-         ->setAutoJsonSerialization(true)
-	$contextSwitch->addActionContext('index', array('xml','json'))->initContext();
-         
-  */       
-        $this->_helper->contextSwitch()
-             ->setContext(
-             'html', array(
-                 'suffix'    => 'html',
-                 'headers'   => array(
-                 'Content-Type' => 'text/html; Charset=UTF-8',
-                ),
-             )
-         )
-         ->addActionContext('get', array('html','xml', 'json'))
-         ->setAutoJsonSerialization(false)
-         ->initContext();          
-         
+/**
+ * AccountController gives access to user accounts
+ *  
+ * @package controllers
+ * @category controllers
+ */
+class AccountController extends KSoft_BaseController
+{        
+    /**
+     * Return response array for view object
+     * 
+     * @param array $accounts
+     * @return array response
+     */
+    private function response($accounts) {
+        return array('status' => $accounts ? KSoft_ErrorCodes::HTTP_OK : 
+                                      KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND, 
+                     'accounts' => $accounts);
     }
- 
     
     /**
-     * The index action handles index/list requests; it should respond with a
-     * list of the requested resources.
-     */ 
-    public function indexAction()
-    {
+     * Return all session owner accounts.
+     */
+    public function indexAction() {                                               
+        $user = Zend_Registry::get(KSoft_Codes::REGISTRY_USER);
+                
         
-    }
- 
-    public function listAction()
-    {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
+        $accountMapper = new Application_Model_AccountMapper();            
+        $accounts = $accountMapper->fetcAllAccounts($user);
 
-    public function headAction()
-    {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
+        $accountsArray = array();
 
+        foreach( $accounts as $account ) {                
+            $accountsArray[]= $account->toArray();
+        }
+               
+        $this->view->msg = $this->response($accountsArray);     
+    }
     
+    /**
+     * Return single account information. Only grants access to user owned accounts.
+     */
     public function getAction()
     {
-        $msg = new KSoft_AccountInfoMsg();
-        $this->view->msg = $msg;                
-        $id = $this->_getParam('id');
-        $sessionId = $this->_getParam('sessionid');
-        if(!isset($sessionId) || $sessionId == "")
-        {
-            $msg->status = KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
-            $this->render();
-            exit();            
-        }
+        $user = Zend_Registry::get(KSoft_Codes::REGISTRY_USER);
         
-        if(strval(intval($id)) != strval($id))
-        {
-            $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
-            $this->render(); 
-        }
+        $accountID = $this->getParam('id');
         
-        //Check valid session
-        $authentication = new Application_Model_AuthenticationMapper();
-        $status = $authentication->sessionAuthentication($id, $sessionId);
-        if($status != KSoft_ErrorCodes::AUTH_OK){
-            $msg->status = $status;
-            $this->render();
-        }
-        
-        $account = new Application_Model_AccountMapper();
-        $data = $account->fetchAccount($id);    
+        $accountMapper = new Application_Model_AccountMapper();            
+        $account = $accountMapper->fetchAccount($user, $accountID);
 
-        if(isset($data) && count($data) > 0)
-        {
-            $msg->id = $data->getId();
-            $msg->owner = $data->getOwner();
-            $msg->balance = $data->getBalance();
-        }
-        else {
-            $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;                            
-        }
-    }
- 
-    public function newAction() {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
-    public function postAction() {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
+        $accountsArray = array();
         
-        //$this->getParams() or $this->getParam('yourvar');
-        $body = $this->getRequest()->getRawBody();
-        $data = Zend_Json::decode($body);
-    }
-    public function editAction() { 
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
-    public function putAction() {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    } 
-    public function deleteAction() {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
+        if( $account ) {
+            $accountsArray[]= $account->toArray();
+        }                
+        
+        $this->view->msg = $this->response($accountsArray); 
     }
 }
 

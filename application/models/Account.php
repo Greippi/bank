@@ -4,7 +4,7 @@ class Application_Model_Account
 {
     public $_id; 
     public $_balance;
-    public $_owner;
+    public $_user;
     
     public function __set($name, $value)
     {
@@ -48,11 +48,15 @@ class Application_Model_Account
         return $this;
     }
     
-    public function setOwner($owner) {
-        $this->_owner = $owner;
+    public function setUser(Application_Model_User $user){
+        $this->_user = $user;
         return $this;
     }
-    
+
+    public function getUser() {
+        return $this;
+    }    
+
     public function getId() {
         return $this->_id;        
     }
@@ -61,8 +65,32 @@ class Application_Model_Account
         return $this->_balance;        
     }
     
-    public function getOwner() {
-        return $this->_owner;        
+    
+    
+    public function toArray() {
+        $array = array('id' => $this->id, 
+                       'balance' => $this->_balance );        
+        
+        if($this->_user) {
+            $array['userid'] = $this->_user->id;
+        }
+        
+        return $array;
     }
+    
+    public static function toModel($resultset) {
+        
+        if($resultset == null) {
+            return null;
+        }
+        
+        $account = new Application_Model_Account();
+        
+        $account->setId($resultset->account_id)
+                ->setBalance($resultset->balance);
+        
+        return $account;
+    }
+    
 }
 

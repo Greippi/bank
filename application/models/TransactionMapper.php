@@ -28,28 +28,39 @@ class Application_Model_TransactionMapper
     {
     }
 
-    
-    public function fetchAll() {
-        try{
-            $resultSet = $this->getDbTable()->fetchAll();
-            $entries   = array();
-            foreach ($resultSet as $row) {
-                $entry = new Application_Model_Transaction();
-            
-                $entry->setId($row->transaction_id)
-                        ->setAccount($row->account)
-                        ->setTarget($row->target)
+    /**
+     * Fetch all account transactions
+     * @param type $accountID
+     * @return array<Application_Model_Transaction>
+     */
+    public function fetchAll($accountID) {
+        
+        $query = $this->getDbTable()
+                      ->select()
+                      ->where('account_id = :accountid')
+                      ->order('done')
+                      ->bind(array('accountid'=>$accountID));
+                      
+        
+        $resultSet = $this->getDbTable()->fetchAll($query);
+        
+        $transactions   = array();
+        
+        foreach ($resultSet as $row) {
+            $transaction = new Application_Model_Transaction();
+
+            $transaction->setId($row->transaction_id)
+                        ->setAccount($row->account_id)
+                        ->setTarget($row->target_id)
                         ->setReference($row->reference)			
                         ->setAmount($row->amount)
                         ->setDescription($row->description)
                         ->setDone($row->done);
-                $entries[] = $entry;
-            }
-            return $entries;
-        } catch (Exception $e) {
-            error_log ('BANK::ERROR: '.$e, 0);
-            return NULL;
+            
+            $transactions[] = $transaction;
         }
+        
+        return $transactions;
     }
     
     public function fetchTransactionsById($id, $offset, $limit) {

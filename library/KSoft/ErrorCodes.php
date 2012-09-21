@@ -1,9 +1,13 @@
 <?php
 
 class KSoft_ErrorCodes {
-    const HTTP_OK = 200;
+    const HTTP_OK = 200;    
+    const HTTP_NOT_IMPLEMENTED = 501;
+    
     const AUTH_OK = 200;    
-    const ERR_HTTP_FAIL = 400;    
+    const ERR_HTTP_FAIL = 400;  
+    
+    
     const ERR_INVALID_PARAMETERS = -1;
     const ERR_INVALID_ACCOUNT_ID_PARAM = -2;    
     const ERR_INVALID_AMOUNT_PARAM = -3;        

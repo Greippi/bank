@@ -1,118 +1,31 @@
 <?php
 
-class TransactionController extends Zend_Rest_Controller
-{
-    public function init()
-    {
-        $this->_helper->contextSwitch()
-            ->setContext(
-                'html', array(
-                'suffix'    => 'html',
-                'headers'   => array(
-                'Content-Type' => 'text/html; Charset=UTF-8',
-               ),
-            )
-         )
-         ->addActionContext('get', array('html','xml', 'json'))
-         ->setAutoJsonSerialization(false)
-         ->initContext();  
-        
-        $this->_helper->contextSwitch()
-                      ->addActionContext('post', array('html', 'xml', 'json'))
-                      ->setAutoJsonSerialization(false)
-                      ->initContext();
-        
-    }
- 
-    /**
-     * The index action handles index/list requests; it should respond with a
-     * list of the requested resources.
-     */ 
+class TransactionController extends KSoft_BaseController
+{   
     public function indexAction()
     {
+        $transactionMapper = new Application_Model_TransactionMapper();
+        $accountMapper = new Application_Model_AccountMapper();
+        $transactionsArray = array();                                    
+        $user = Zend_Registry::get(KSoft_Codes::REGISTRY_USER);
+        
+        $accounts = $accountMapper->fetcAllAccounts($user);
+        
+        foreach( $accounts as $account ) {            
+            $transactions = $transactionMapper->fetchAll($account->id);
+            
+            foreach( $transactions as $ts ){
+                $array = $ts->toArray();            
+                $transactionsArray[] = $array;
+            }            
+        }
+        
+        $response = array('status' => KSoft_ErrorCodes::AUTH_OK, 
+                          'transactions' => $transactionsArray);
+        
+        $this->view->msg = $response;
     }
 
-    public function responseAction()
-    {
-    }
-    
-    public function listAction()
-    {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
- 
-    public function getAction()
-    {
-        $msg = new KSoft_TransactionInfoMsg();
-        $this->view->msg = $msg;                
-        $id = $this->_getParam('id');
-        $sessionId = $this->_getParam('sessionid');
-        if(!isset($sessionId) || $sessionId == "")
-        {
-            $msg->status = KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
-            $this->render();
-        }
-
-        if(strval(intval($id)) != strval($id))
-        {
-            $msg->status = KSoft_ErrorCodes::ERR_INVALID_ACCOUNT_ID_PARAM;            
-        }
-        
-        //Check valid session
-        $authentication = new Application_Model_AuthenticationMapper();
-        $status = $authentication->sessionAuthentication($id, $sessionId);
-        if($status != KSoft_ErrorCodes::AUTH_OK){
-            $msg->status = $status;
-            $this->render();
-        }
-        
-        $limit = $this->_getParam('limit');        
-        $offset = $this->_getParam('offset');      
-        
-        if(!isset($limit) || (strval(intval($limit)) != strval($limit)) || $limit < 0)        
-            $limit = NULL;                
-        if(!isset($offset) || (strval(intval($offset)) != strval($offset)) || $offset < 0)        
-            $offset = NULL;                
-
-        try
-        {
-            $transactions = new Application_Model_TransactionMapper();
-            $data = $transactions->fetchTransactionsById($id, $offset, $limit);    
-        }
-        catch(OutOfBoundsException $e){
-            $msg->status = KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND;
-            $this->render();            
-        }
-        
-        if(isset($data) && count($data) > 0)
-        {
-            foreach ($data as $item) {  
-                $entry = array(
-                    'id' => $item->getId(),
-                    'account' => $item->getAccount(),
-                    'target' => $item->getTarget(),                
-                    'reference' => $item->getReference(), 				  
-                    'amount' => $item->getAmount(), 				                      
-                    'description' => $item->getDescription(), 				                                          
-                    'done' => $item->getDone()); 				                                                              
-                $entries[] = $entry;                
-            }
-            $msg->transactions = $entries;
-        }
-    }
- 
-    public function newAction() { 
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
-    
-    //Example for getting request headers
-/*    public function preDispatch()
-    {
-        $request = new Zend_Controller_Request_Http();
-        $key = $request->getHeader('x-apikey');
-    }*/
     
     public function postAction() {
         $msg = new KSoft_ResponseMsg();
@@ -208,26 +121,6 @@ class TransactionController extends Zend_Rest_Controller
         
         $transaction = new Application_Model_TransactionMapper();
         $transaction->createTransaction($accountId, $targetId, uniqid(), $amount, $description);
-    }
-    
-    public function editAction() {    	 
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
-    public function putAction() {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    } 
-    public function deleteAction() {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
-
-    public function headAction()
-    {
-        $this->getResponse()->setHttpResponseCode(KSoft_ErrorCodes::ERR_HTTP_FAIL);        
-        exit('not implemented');
-    }
-    
+    }    
 }
 

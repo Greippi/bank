@@ -5,7 +5,7 @@ class Application_Model_AccountMapper
     protected $_dbTable;
     
      public function setDbTable($dbTable)
-    {
+     {
         if (is_string($dbTable)) {
             $dbTable = new $dbTable();
         }
@@ -16,6 +16,10 @@ class Application_Model_AccountMapper
         return $this;
     }
     
+    /**
+     * 
+     * @return Application_Model_DbTable_Account
+     */
     public function getDbTable()
     {
         if (null === $this->_dbTable) {
@@ -28,45 +32,72 @@ class Application_Model_AccountMapper
     {
     }
     
-    public function fetchAll() {
-        try{                        
-            $resultSet = $this->getDbTable()->fetchAll();
-            $entries   = array();
-            foreach ($resultSet as $row) {
-                $entry = new Application_Model_Account();
+    public function fetcAllAccounts(Application_Model_User $user) {
+        
+        $userMapper = new Application_Model_UserMapper();
+        
+        $table = $this->getDbTable();
+        
+        $query = $table->select()
+                       ->where('user_id = :uid')
+                       ->bind(array('uid' => $user->id));
+        
+        $resultSet = $table->fetchAll($query);
+        
+        $accounts = array();
+        
+        foreach ($resultSet as $row) {            
+            $user = $userMapper->get($row->user_id);
             
-                $entry->setId($row->account_id)
-                      ->setBalance($row->balance);
-                $entries[] = $entry;
-            }
-            return $entries;
-        } catch (Exception $e) {
-            error_log ('BANK::ERROR: '.$e, 0);            
-            return -100;
+            $account = new Application_Model_Account();
+
+            $account->setId($row->account_id)
+                    ->setBalance($row->balance)
+                    ->setUser($user);
+            
+            $accounts[] = $account;
         }
+        
+        return $accounts;        
     }
     
-    public function fetchAccount($id) {  
-        $entry = NULL;        
-        try{                        
-            $table = $this->getDbTable();
-            $rows = $table->find((int)$id);
-            if(isset($rows))
-            {
-                foreach ($rows as $row) {  
-                    $entry = new Application_Model_Account();
-                    $entry->setId($row->account_id)
-                          ->setBalance($row->balance);
-                }
-                return $entry;
-            }
-        } catch (Exception $e) {
-            echo $e;
-            die;
-            error_log ('BANK::ERROR: '.$e, 0);            
-            return NULL;
+    public function fetchAll() {
+        
+        $userMapper = new Application_Model_UserMapper();
+        
+        $resultSet = $this->getDbTable()->fetchAll();      
+        $accounts = array();
+        
+        foreach ($resultSet as $row) {            
+            $user = $userMapper->get($row->user_id);
+            
+            $account = new Application_Model_Account();
+
+            $account->setId($row->account_id)
+                  ->setBalance($row->balance)
+                  ->setUser($user);
+            
+            $accounts[] = $account;
         }
-    }  
+        
+        return $accounts;        
+    }
+    
+    public function fetchAccount(Application_Model_User $user, $accountID) {  
+        
+        $table = $this->getDbTable();
+        
+        $query = $table->select()
+                       ->where('user_id = :uid')
+                       ->where('account_id = :accountid')
+                       ->bind(array('uid' => $user->id, 
+                                    'accountid' => $accountID));
+        
+        $resultSet = $table->fetchRow($query);
+                
+        return Application_Model_Account::toModel($resultSet);
+    }
+ 
     
     public function updateAccount($id, $amount) {    
         $table = $this->getDbTable();        

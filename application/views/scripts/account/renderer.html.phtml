@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<body   
+<div id="status"><?php echo $this->msg['status']; ?></div>    
+<div id="accounts">
+<table>
+    <thead>
+        <tr><th>ID</th><th>Balance</th></tr>
+    </thead>        
+    
+    <tbody>
+    <?php foreach ($this->msg['accounts'] as $account) : ?>
+        <tr>
+            <td><?php echo $account['id']; ?></td>
+            <td><?php echo $account['balance']; ?></td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>    
+</table>    
+</div>                          
+</body>
+</html>

@@ -11,9 +11,17 @@
  * @author reino.hanninen
  */
 class Application_Model_AuthenticationMapper {
+    
     protected $_dbUserTable;
     protected $_dbSessionTable;    
     
+        /**
+     * Return Application_Model_DbTable_Session
+     * 
+     * @param type $dbTable
+     * @return Zend_Db_Table_Abstract
+     * @throws Exception
+     */
     public function getSessionDbTable()
     {
         if (null === $this->_dbSessionTable) {
@@ -22,6 +30,13 @@ class Application_Model_AuthenticationMapper {
         return $this->_dbSessionTable;
     }
     
+    /**
+     * Return Application_Model_DbTable_User
+     * 
+     * @param type $dbTable
+     * @return Zend_Db_Table_Abstract
+     * @throws Exception
+     */
     public function getUserDbTable()
     {
         if (null === $this->_dbUserTable) {
@@ -29,8 +44,7 @@ class Application_Model_AuthenticationMapper {
         }
         return $this->_dbUserTable;
     }
-    
-    
+        
     public function setUserDbTable($dbTable)
     {
         if (is_string($dbTable)) {
@@ -54,74 +68,118 @@ class Application_Model_AuthenticationMapper {
         $this->_dbSessionTable = $dbTable;
         return $this;
     }
- 
-    public function sessionAuthentication($accountId,$sessionId) {  
+    
+    /**
+     * Check is session alive, if session alive return session owner.
+     * 
+     * @param type $sessionkey
+     */
+    public function sessionAlive($sessionkey) {
+        $table = $this->getSessionDbTable();
         
-        try{   
-            $table = $this->getSessionDbTable();
-            $query = $table->select()
-                   ->where('account_id = :p1')                    
-                   ->where('session = :p2')
-                   ->where('TIME_TO_SEC(timediff(now(),valid)) / 60 <  5')                    
-                   ->bind(array('p1'=>$accountId,'p2'=>$sessionId));
-            $row = $table->fetchRow($query);  
+        $now = new Zend_Date(time(), new Zend_Locale('GMT'));  
+        $time = $now->toString(KSoft_Codes::MYSQL_TIMESTAMP_FORMAT);
+        
+        $query = $table->select()
+                        ->where('sessionkey = :sessionkey AND valid > :time')
+                        ->bind(array('sessionkey'=>$sessionkey, 'time' => $time));
+        
+       $result = $table->fetchRow($query);
+       
+       if($result) {
+           $usermapper = new Application_Model_UserMapper();           
+           return $usermapper->get($result->user_id);           
+       }
+       
+       return false;
+    }
+ 
+    /**
+     * Fetch exising sessionkey for user if sessionkey don't exist create new
+     * and return that.
+     * 
+     * @param Application_Model_User $user
+     * @return Application_Model_Session
+     */
+    public function getSession(Application_Model_User $user) {  
+        
+        $table = $this->getSessionDbTable();
             
-            //update time stamp and return ok
-            if(isset($row))
-            {
-                $row->valid = new Zend_Db_Expr('NOW()');
-                $row->save();
-                return KSoft_ErrorCodes::AUTH_OK;
-            }
-            return KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;            
-        } catch (Exception $e) {
-            error_log ('BANK::ERROR: '.$e, 0);            
-            return KSoft_ErrorCodes::ERR_AUTH_UNKNOWN_ERROR;    
+        $now = new Zend_Date(time(), new Zend_Locale('GMT'));  
+        $time = $now->toString(KSoft_Codes::MYSQL_TIMESTAMP_FORMAT);
+        
+        $query = $table->select()
+                        ->where('user_id = :uid AND valid > :time')
+                        ->bind(array('uid'=>$user->id, 'time' => $time));
+        
+        $result = $table->fetchRow($query);               
+        
+        if(!$result) {
+            $result = $this->createSession($user);
         }
+        
+        return Application_Model_Session::toModel($result);
+    }  
+    
+    public function createSession(Application_Model_User $user) {          
+        $table = $this->getSessionDbTable();          
+        
+        $config = Zend_Registry::get('config');
+
+        $created = new Zend_Date(time(), new Zend_Locale('GMT'));       
+        $valid = $created->addSecond($config->get('kilosoft')->user->sessionexpire);
+        
+        $created = $created->toString(KSoft_Codes::MYSQL_TIMESTAMP_FORMAT);
+        $valid = $valid->toString(KSoft_Codes::MYSQL_TIMESTAMP_FORMAT);
+        
+        $params = array('user_id'=> $user->id,
+                        'created' => $created,
+                        'valid'=> $valid,
+                        'sessionkey' => uniqid() );                
+        
+        $id = $table->insert($params);
+        
+        return $table->fetchRow($table->select()
+                                       ->where('session_id = :sid')
+                                       ->bind(array('sid'=>$id)));                
     }  
 
-    public function loginAuthentication($accountId,$loginName,$password,$operator) {  
-        $result = array('status'=>  KSoft_ErrorCodes::ERR_AUTH_UNKNOWN, 'sessionid'=>"");
-        $db = Zend_Db_Table::getDefaultAdapter();                            
-        try{      
-            $userTable = $this->getUserDbTable();
-            $sessionTable = $this->getSessionDbTable();            
-            
-            $query = $userTable->select()
-                   ->where('loginname = :p1')
-                   ->where('passwordhash = :p2')                    
-                   ->where('accountid = :p3')                                        
-                   ->bind(array('p1'=>$loginName,'p2'=>$password, 
-                       'p3'=>$accountId));
-            
-            $row = $userTable->fetchRow($query);                
-            if(!isset($row))
-                return $result;
-            
-            $db->beginTransaction();                        
-            //Delete old session if exists and create new one
-            $query = $sessionTable->select()
-                   ->where('originator = :p1')
-                   ->where('account_id = :p2')                    
-                   ->bind(array('p1'=>$operator,'p2'=>$accountId));
-            
-            $row = $sessionTable->fetchRow($query);
-            if(isset($row))
-                $row->delete();
+     /**
+     * Authenticate user by login name and by given password. Return a
+     * sessionkey if user is authenticated.
+     * 
+     * @param string $loginname
+     * @param string $password md5 hashed password
+     * @return array(sessionkey, status)
+     */
+    public function authenticate( $loginname,$password ) {  
+                              
+        $response = array('sessionkey'=> false, 'status'=> '');                                           
+           
+        $userTable = $this->getUserDbTable();                                         
+        
+        $query = $userTable->select()
+                        ->where('passwordhash = MD5(CONCAT( :password, user.passwordsalt )) '
+                                . 'AND loginname = :loginname' )
 
-            //insert new session
-            $result["sessionid"] = uniqid();
-            $result["status"] = KSoft_ErrorCodes::AUTH_OK;            
-            $data = array('account_id' => $accountId,
-                    'originator' => $operator,
-                    'session' => $result["sessionid"]);
-            $sessionTable->insert($data);
-            $db->commit();
-            return $result;
-        } catch (Exception $e) {
-            $db->rollBack();                        
-            error_log ('BANK::ERROR: '.$e, 0);            
+                        ->bind(array('loginname'=>$loginname,
+                                     'password'=> $password));        
+        
+        $result = $userTable->fetchRow($query);    
+                      
+        if($result) {
+            $user = Application_Model_User::toModel($result);            
+             $session = $this->getSession($user);
+             $response['sessionkey'] = $session->sessionkey;
+        }        
+         
+        if( $response['sessionkey'] ) {
+            $response['status'] = KSoft_ErrorCodes::AUTH_OK;
+        } else {
+            $response['status'] = KSoft_ErrorCodes::ERR_AUTH_UNKNOWN;
         }
+        
+        return $response;   
     }  
 }
 

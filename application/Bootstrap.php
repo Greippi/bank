@@ -2,43 +2,18 @@
 
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
+
+    protected function _initApplication() {
+        $config = new Zend_Config($this->getOptions(), false);
+        Zend_Registry::set('config', $config);
+    }
+    
     protected function _initRestRoute()
     {
-        /*
-        $this->bootstrap('frontController');
-        $frontController = Zend_Controller_Front::getInstance();        
-        $restRouteURL = new Zend_Rest_Route($frontController, array( 'controller' => 'account', 'module' => 'jees', 'action' => 'info', 'accountid' => '-1'));                
-        $frontController->getRouter()->addRoute('rest', $restRouteURL);
-        $transactionURL = new Zend_Rest_Route($frontController, array( 'controller' => 'transaction', 'action' => 'info', 'transactionid' => '-1'));                        
-        $frontController->getRouter()->addRoute('rest', $transactionURL);
-
-*/
         $this->bootstrap('frontController');
         $frontController = Zend_Controller_Front::getInstance();            
         $restRoute = new Zend_Rest_Route($frontController);
         $frontController->getRouter()->addRoute('default', $restRoute);
-        
-/*        
-	$this->bootstrap('Request');	
-	$front = $this->getResource('FrontController');
-        
-        $restRoute = new Zend_Rest_Route($front);
-        $front->getRouter()->addRoute('default', $restRoute);
-
-        
-	$restRoute = new Zend_Rest_Route($front, array(), array(
-            'default' => array('account')));
-	$front->getRouter()->addRoute('rest', $restRoute);        
-
-        $restRoute = new Zend_Rest_Route($front, array(), array(
-		'version' => array('version')
-	));
-	$front->getRouter()->addRoute('rest', $restRoute);
-
-        $restRoute = new Zend_Rest_Route($front, array(), array(
-            'transaction' => array('transaction')
-	));
-	$front->getRouter()->addRoute('rest', $restRoute);                */
     } 
  
     protected function _initRequest()
@@ -46,12 +21,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $this->bootstrap('FrontController');
         $front = $this->getResource('FrontController');
         $request = $front->getRequest();
-    	if (null === $front->getRequest()) {
+        
+    	if(!$request) {
             $request = new Zend_Controller_Request_Http();
             $front->setRequest($request);
         }
+        
     	return $request;        
     } 		
 
+        protected function _initSessionCheck() {
+        $front = Zend_Controller_Front::getInstance();
+        $front->registerPlugin(new KSoft_SessionCheck());
+    }
 }
 

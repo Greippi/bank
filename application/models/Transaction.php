@@ -106,5 +106,17 @@ class Application_Model_Transaction
     public function getDone() {
         return $this->_done;
     }
+    
+    public function toArray() {
+        $array = array('id' => $this->getId(),
+                       'account' => $this->getAccount(),
+                       'target' => $this->getTarget(),                
+                       'reference' => $this->getReference(), 				  
+                       'amount' => $this->getAmount(), 				                      
+                       'description' => $this->getDescription(), 				                                          
+                       'done' => $this->getDone()); 
+        
+        return $array;
+    }
 }
 

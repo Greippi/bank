@@ -1,0 +1,28 @@
+<?php    
+    $doc = new DOMDocument();
+    
+    $doc->formatOutput = $this->format;
+    
+    $responseElement = $doc->createElement("response");
+    
+    $status = $doc->createElement("status");
+    $status->appendChild($doc->createTextNode($this->msg['status']));
+    
+    $accounts = $doc->createElement("accounts");
+    
+    foreach($this->msg['accounts'] as $account) {       
+        $accountElement = $doc->createElement('account');
+        
+        $accountElement->setAttribute('id',$account['id']);
+        $accountElement->setAttribute('balance',$account['balance']);
+        
+        $accounts->appendChild($accountElement);
+    }
+        
+    $responseElement->appendChild($status);
+    $responseElement->appendChild($accounts);
+    
+    $doc->appendChild($responseElement);
+    
+    echo $doc->saveXML();    
+?>
