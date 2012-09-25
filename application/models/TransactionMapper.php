@@ -33,12 +33,13 @@ class Application_Model_TransactionMapper
      * @param type $accountID
      * @return array<Application_Model_Transaction>
      */
-    public function fetchAll($accountID) {
+    public function fetchAll($accountID, 
+                             $order = 'done DESC') {
         
         $query = $this->getDbTable()
                       ->select()
                       ->where('account_id = :accountid')
-                      ->order('done')
+                      ->order($order)                      
                       ->bind(array('accountid'=>$accountID));
                       
         
@@ -49,7 +50,7 @@ class Application_Model_TransactionMapper
         foreach ($resultSet as $row) {
             $transaction = new Application_Model_Transaction();
 
-            $transaction->setId($row->transaction_id)
+            $transaction->setId($row->id)
                         ->setAccount($row->account_id)
                         ->setTarget($row->target_id)
                         ->setReference($row->reference)			
@@ -63,7 +64,7 @@ class Application_Model_TransactionMapper
         return $transactions;
     }
     
-    public function fetchTransactionsById($id, $offset, $limit) {
+    public function fetchTransactionsById($id, $offset, $limit, $order = 'done DESC') {
         $entries = NULL;                    
         $loc_offset = 0;
         $loc_limit = 10;
@@ -79,16 +80,18 @@ class Application_Model_TransactionMapper
             $loc_limit = $limit;
         
         $table = $this->getDbTable();
+        
         $query = $table->select()
-                   ->where('account = :id or target = :id' )
-                   ->order('done DESC')
-                   ->limit(intval($loc_limit),  intval($loc_offset))
-                   ->bind(array('id'=>$id));
+                    ->where('account = :id or target = :id' )
+                    ->order($order)
+                    ->limit(intval($loc_limit),  intval($loc_offset))
+                    ->bind(array('id'=>$id));
+        
         $rows = $table->fetchAll($query);                
 
         foreach ($rows as $row) {
             $entry = new Application_Model_Transaction();
-            $entry->setId($row->transaction_id)
+            $entry->setId($row->id)
             ->setAccount($row->account)
             ->setTarget($row->target)
             ->setReference($row->reference);

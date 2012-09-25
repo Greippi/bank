@@ -88,7 +88,7 @@ class Application_Model_AuthenticationMapper {
        
        if($result) {
            $usermapper = new Application_Model_UserMapper();           
-           return $usermapper->get($result->user_id);           
+           return $usermapper->get($result->id);           
        }
        
        return false;
@@ -140,7 +140,7 @@ class Application_Model_AuthenticationMapper {
         $id = $table->insert($params);
         
         return $table->fetchRow($table->select()
-                                       ->where('session_id = :sid')
+                                       ->where('id = :sid')
                                        ->bind(array('sid'=>$id)));                
     }  
 

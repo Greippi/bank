@@ -11,24 +11,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     protected function _initRestRoute()
     {
         $this->bootstrap('frontController');
+        
         $frontController = Zend_Controller_Front::getInstance();            
         $restRoute = new Zend_Rest_Route($frontController);
-        $frontController->getRouter()->addRoute('default', $restRoute);
-    } 
- 
-    protected function _initRequest()
-    {
-        $this->bootstrap('FrontController');
-        $front = $this->getResource('FrontController');
-        $request = $front->getRequest();
         
-    	if(!$request) {
-            $request = new Zend_Controller_Request_Http();
-            $front->setRequest($request);
-        }
-        
-    	return $request;        
-    } 		
+        $frontController->getRouter()
+                        ->addRoute('default', $restRoute);
+    } 	
 
     protected function _initSessionCheck() {
         $front = Zend_Controller_Front::getInstance();

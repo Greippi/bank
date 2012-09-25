@@ -7,6 +7,13 @@
  */
 class AuthenticationController extends KSoft_BaseController {      
             
+    
+    public function indexAction() {
+        $this->getResponse()->setHttpResponseCode(401);//Access not allowed                        
+        $this->view->msg = new KSoft_ResponseMsg(KSoft_ErrorCodes::ERR_AUTH_EXPIRED, 
+                                                "Authentication expired. Please renew the authentication.");
+    }
+    
     /**
      * Return sessionkey POST-action
      */

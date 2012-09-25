@@ -1,0 +1,38 @@
+<?php
+$doc = new DOMDocument();
+
+$doc->formatOutput = $this->format;            
+
+$responseElement = $doc->createElement("response");
+
+$status = $doc->createElement("status");
+$status->appendChild($doc->createTextNode(500));
+
+$message = $doc->createElement("message");
+$message->appendChild($doc->createTextNode($this->exception->getMessage()));
+
+$stacktrace = $doc->createElement("stacktrace");
+$stacktrace->appendChild($doc->createTextNode($this->exception->getTraceAsString()));
+
+$params = $doc->createElement("params");
+
+
+foreach( $this->request->getParams() as $param => $value) {
+    $parameter = $doc->createElement("param");    
+    $parameter->setAttribute('name', $param );
+    $parameter->setAttribute('value', $value );
+    $params->appendChild($parameter);
+}
+
+$responseElement->appendChild($status);
+$responseElement->appendChild($params);
+
+if (isset($this->exception)) {
+    $responseElement->appendChild($message);    
+    $responseElement->appendChild($stacktrace);
+}
+
+$doc->appendChild($responseElement);
+
+echo $doc->saveXML();   
+?>

@@ -4,12 +4,9 @@
  * 
  * @package controllers
  * @category controllers
- * 
- * TODO: Add limit, order, order by, offset and default limit
  */
 class TransactionController extends KSoft_BaseController
-{   
-    
+{               
     /**
      * List all transactions from all accounts
      *      
@@ -23,8 +20,11 @@ class TransactionController extends KSoft_BaseController
         
         $accounts = $accountMapper->fetcAllAccounts($user);
         
+        $order = $this->orderBy(Application_Model_Transaction::keys());
+        
         foreach( $accounts as $account ) {            
-            $transactions = $transactionMapper->fetchAll($account->id);
+            $transactions = $transactionMapper->fetchAll($account->id, 
+                                                         $order);
             
             foreach( $transactions as $ts ){
                 $array = $ts->toArray();            
@@ -32,9 +32,8 @@ class TransactionController extends KSoft_BaseController
             }            
         }
         
-        //FIXME: Arrange transaction by accountID
         $response = array('status' => KSoft_ErrorCodes::AUTH_OK, 
-                          'transactions' => $transactionsArray);
+                          'transactions' => $transactionsArray);                
         
         $this->view->msg = $response;
     }
@@ -43,7 +42,9 @@ class TransactionController extends KSoft_BaseController
      * List all transactions from one single account
      */
     public function getAction()
-    {
+    {               
+        $response = new KSoft_TransactionResponse(KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND);
+        
         $id = $this->getParam('id');
         
         $transactionMapper = new Application_Model_TransactionMapper();
@@ -53,19 +54,23 @@ class TransactionController extends KSoft_BaseController
 
         $user = Zend_Registry::get(KSoft_Codes::REGISTRY_USER);        
         
-        if( $accountMapper->fetchAccount($user, $id) ) {                    
-            $transactions = $transactionMapper->fetchAll($id);
+        $account = $accountMapper->fetchAccount($user, $id);
+        
+        if( $account ) {                    
+            $response->status = KSoft_ErrorCodes::AUTH_OK;
+            
+            $order = $this->orderBy(Application_Model_Transaction::keys());
+            $transactions = $transactionMapper->fetchAll($id, 
+                                                         $order);
 
             foreach( $transactions as $ts ){
                 $array = $ts->toArray();            
                 $transactionsArray[] = $array;
             }
-        }
+        } 
         
-        $response = array('status' => KSoft_ErrorCodes::AUTH_OK, 
-                          'transactions' => $transactionsArray);
-        
-        $this->view->msg = $response;
+        $response->transactions = $transactionsArray;        
+        $this->view->msg = $response->toArray();
     }
     
     /**
@@ -112,6 +117,7 @@ class TransactionController extends KSoft_BaseController
         }
         
         $this->view->msg = $response;
-    }    
+    }
+
 }
 

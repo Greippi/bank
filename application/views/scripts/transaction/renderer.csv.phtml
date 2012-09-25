@@ -1,0 +1,12 @@
+<?php 
+$csv = 'status;' . $this->msg['status'] ."\n";
+
+$csv .= implode(";", Application_Model_Transaction::keys()) ."\n";
+
+foreach( $this->msg['transactions'] as $transaction ) {
+    $transaction['description'] = '"'.  $transaction['description'].'"';
+    $csv .= implode(";",$transaction ) ."\n";
+}
+
+echo $csv;
+?>

@@ -63,7 +63,7 @@ class Application_Model_Account extends KSoft_Model
         
         $account = new Application_Model_Account();
         
-        $account->setId($resultset->account_id)
+        $account->setId($resultset->id)
                 ->setBalance($resultset->balance)
                 ->setName($resultset->name);
         

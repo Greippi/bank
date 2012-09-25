@@ -1,0 +1,12 @@
+<?php
+$error = array('status' => 500, 
+               'title' => 'An error occurred',                
+               'params' => $this->request->getParams());
+
+if (isset($this->exception)) {
+    $error['message'] = $this->message;
+    $error['exception'] = $this->exception->getMessage();
+    $error['stacktrace'] = $this->exception->getTraceAsString();    
+}
+echo json_encode($error);
+?>

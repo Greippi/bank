@@ -82,7 +82,7 @@ class Application_Model_AccountMapper
         
         $query = $table->select()
                        ->where('user_id = :uid')
-                       ->where('account_id = :accountid')
+                       ->where('id = :accountid')
                        ->bind(array('uid' => $user->id, 
                                     'accountid' => $accountID));
         
@@ -95,7 +95,7 @@ class Application_Model_AccountMapper
         $table = $this->getDbTable();
         
         $data = array('balance' => $account->balance);        
-        $where['account_id = ?'] = $account->id;
+        $where['id = ?'] = $account->id;
         
         $table->update($data, $where);
     }  

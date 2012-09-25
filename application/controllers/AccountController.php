@@ -15,7 +15,7 @@ class AccountController extends KSoft_BaseController
      */
     private function response($accounts) {
         return array('status' => $accounts ? KSoft_ErrorCodes::HTTP_OK : 
-                                      KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND, 
+                                             KSoft_ErrorCodes::ERR_ACCOUNT_NOT_FOUND, 
                      'accounts' => $accounts);
     }
     

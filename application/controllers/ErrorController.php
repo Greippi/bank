@@ -2,8 +2,6 @@
 /**
  * ErrorController
  * 
- * TODO: refactor to use KSoft_BaseController
- * 
  * @package controllers
  * @category controllers 
  */
@@ -13,17 +11,17 @@ class ErrorController extends Zend_Controller_Action
     public function headAction()
     {
         $this->getResponse()->setHttpResponseCode(500);        
-        exit('not implemented');
     }
 
     public function errorAction()
     {
+        
         $errors = $this->_getParam('error_handler');
         
         if (!$errors || !$errors instanceof ArrayObject) {
             $this->view->message = 'You have reached the error page';
             return;
-        }
+        }                
         
         switch ($errors->type) {
             case Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_ROUTE:
@@ -53,7 +51,21 @@ class ErrorController extends Zend_Controller_Action
             $this->view->exception = $errors->exception;
         }
         
-        $this->view->request   = $errors->request;
+        $this->view->request  = $errors->request;
+        
+        if( $errors->exception instanceof Zend_View_Exception ) {
+            $this->view->message = "Have you set the request parameter 'format=json|xml|html'?";
+        }
+
+        //Formated exceptions by type:        
+        if($this->getParam('format') == 'json' ) {
+            $this->getResponse()->setHeader('Content-type', 'application/json; charset: UTF-8;');
+            $this->renderScript('error/error.json.phtml');
+        }
+        if($this->getParam('format') == 'xml' ) {
+            $this->getResponse()->setHeader('Content-type', 'application/xml; charset: UTF-8;');
+            $this->renderScript('error/error.xml.phtml');
+        }  
     }
 
     public function getLog()
