@@ -88,7 +88,7 @@ class Application_Model_AuthenticationMapper {
        
        if($result) {
            $usermapper = new Application_Model_UserMapper();           
-           return $usermapper->get($result->id);           
+           return $usermapper->get($result->user_id);           
        }
        
        return false;
@@ -160,15 +160,15 @@ class Application_Model_AuthenticationMapper {
         
         $query = $userTable->select()
                         ->where('passwordhash = MD5(CONCAT( :password, user.passwordsalt )) '
-                                . 'AND loginname = :loginname' )
+                                .'AND loginname = :loginname' )
 
                         ->bind(array('loginname'=>$loginname,
                                      'password'=> $password));        
         
-        $result = $userTable->fetchRow($query);    
-                      
+        $result = $userTable->fetchRow($query);                                  
+        
         if($result) {
-            $user = Application_Model_User::toModel($result);            
+             $user = Application_Model_User::toModel($result);            
              $session = $this->getSession($user);
              $response['sessionkey'] = $session->sessionkey;
         }        
