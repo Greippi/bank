@@ -88,5 +88,5 @@ Create tables by running SQL-script:
 ```
 Authors
 =========
-Kilosoft Oy
-Teemu Puukko
+*  Kilosoft Oy
+*  Teemu Puukko
