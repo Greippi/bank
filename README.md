@@ -2,25 +2,27 @@ Dumpomatic Bank Webservice
 ====
 
 This is a application that will change how you look the banking business.
-It all about experimentation. It is made by using Zend 1.2 framework. 
-It is a result of experimentation and learning process.
+It all about experimentation. It is made by using Zend 1.2 framework, MySQL,
+Apache and PHP. It is a result of experimentation and learning process. So this
+in not really nothing production ready code..
 
 Supported output formats are:
 ====
-*JSON
-*HTML
-*XML
-*CSV
+*  JSON
+*  HTML
+*  XML
+*  CSV
 
 Database Setting (/application/configs/application.ini)
 ================================
+```
 resources.db.adapter = "pdo_mysql"
 resources.db.params.host = "localhost"
 resources.db.params.username = "pankkiiri"
 resources.db.params.password = "123asdfasdo93kkaxf"
 resources.db.params.dbname = "safe"
 resources.db.params.charset = "utf8"
-
+```
 Virtual Host
 ================================
 ```
@@ -75,3 +77,16 @@ Create tables by running SQL-script:
 ```
 /docs/resources/safe.sql
 ```
+
+```
+    ___                 _                        _   _      
+   /   \_   _ _ __ ___ | |__   ___   /\/\   __ _| |_(_) ___ 
+  / /\ / | | | '_ ` _ \| '_ \ / _ \ /    \ / _` | __| |/ __|
+ / /_//| |_| | | | | | | |_) | (_) / /\/\ \ (_| | |_| | (__ 
+/___,'  \__,_|_| |_| |_|_.__/ \___/\/    \/\__,_|\__|_|\___|
+
+```
+Authors
+=========
+Kilosoft Oy
+Teemu Puukko
